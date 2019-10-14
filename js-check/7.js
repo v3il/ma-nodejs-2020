@@ -6,9 +6,7 @@ const valueToFind = 'cucumber';
 function findValueUsingIf() {
     if (vegetables.includes(valueToFind)) {
         return 'vegetables';
-    }
-
-    if (fruits.includes(valueToFind)) {
+    } else {
         return 'fruits';
     }
 }
@@ -16,10 +14,7 @@ function findValueUsingIf() {
 function findValueUsingSwitch() {
     switch (vegetables.includes(valueToFind)) {
         case true: return 'vegetables';
-    }
-
-    switch (fruits.includes(valueToFind)) {
-        case true: return 'fruits';
+        case false: return 'fruits';
     }
 }
 
