@@ -10,3 +10,5 @@ if (true) {
 
 const sum = my_number + myNumber + number; // Result: -1 + 2 + 6 = 7
 console.log(sum);
+
+module.exports = sum;
