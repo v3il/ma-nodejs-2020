@@ -13,7 +13,7 @@ describe('3.js', () => {
 
     it('getOLetterPositions method works correctly', () => {
         expect(getOLetterPositions(123)).toStrictEqual([]);
-        expect(getOLetterPositions({})).toStrictEqual([2]);
+        expect(getOLetterPositions({})).toStrictEqual([2]); // [object Object]
         expect(getOLetterPositions([])).toStrictEqual([]);
         expect(getOLetterPositions([1])).toStrictEqual([]);
         expect(getOLetterPositions(undefined)).toStrictEqual([]);
