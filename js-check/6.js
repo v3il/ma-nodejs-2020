@@ -3,7 +3,7 @@ function getFlatArray(...arrays) {
         return [];
     }
 
-    let maxIndex = Math.max.apply(null, [...arrays.map(array => array.length)]) - 1;
+    let maxIndex = Math.max.apply(null, arrays.map(array => array.length)) - 1;
     let result = [];
 
     while (maxIndex >= 0) {
