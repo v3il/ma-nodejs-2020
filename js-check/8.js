@@ -1,7 +1,7 @@
 class Planet {
     constructor(name, radius) {
-        this.name = name;
-        this.radius = radius;
+        this.name = typeof name === 'string' ? name : '';
+        this.radius = typeof radius === 'number' && Number.isFinite(radius) && radius >= 0 ? radius : 0;
     }
 
     getVolume() {
@@ -21,7 +21,4 @@ class Earth extends Planet {
 
 console.log(new Earth().describe());
 
-module.exports = {
-    Planet,
-    Earth,
-};
+module.exports = { Planet, Earth };
