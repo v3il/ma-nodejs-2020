@@ -17,7 +17,7 @@ function getOLetterPositions(text) {
 }
 
 function doTask(text) {
-    getOLetterPositions(text).forEach((position) => console.log(position));
+    getOLetterPositions(text).forEach(position => console.log(position));
     console.log(replaceLLetters(text));
 }
 
