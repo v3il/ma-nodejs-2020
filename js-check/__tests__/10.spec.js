@@ -138,9 +138,8 @@ describe('Storage', () => {
 
         try {
             await storage.fetchInTimeOrFail('test', 200);
-        } catch (error) {
-            expect(error instanceof Error).toBe(true);
-            expect(error.name).toBe('TimeoutError');
+        } catch (data) {
+            expect(data).toBe(undefined);
         }
     });
 });
