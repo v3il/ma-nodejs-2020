@@ -1,3 +1,10 @@
+class TimeoutError extends Error {
+    constructor() {
+        super();
+        this.name = 'TimeoutError';
+    }
+}
+
 class Storage {
     constructor() {
         this.storage = new Map();
@@ -36,17 +43,13 @@ class Storage {
     }
 
     async fetchInTimeOrFail(key, timeout) {
-        return new Promise((resolve, reject) => {
-            setTimeout(async () => {
-                const data = await this.fetch(key);
+        const dataFetchPromise = this.fetch(key);
+        const timeoutPromise = new Promise((resolve, reject) => setTimeout(reject, timeout, new TimeoutError()));
 
-                if (data) {
-                    resolve(data);
-                } else {
-                    reject();
-                }
-            }, timeout);
-        });
+        return Promise.race([
+            dataFetchPromise,
+            timeoutPromise,
+        ]);
     }
 }
 

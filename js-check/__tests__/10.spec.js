@@ -129,13 +129,18 @@ describe('Storage', () => {
             { key: false, data: 5 },
         ]);
 
-        const data = await storage.fetchInTimeOrFail('test', 500);
-        expect(data).toBe(2);
+        const result = await storage.fetchInTimeOrFail('test', 100);
+        expect(result).toBe(2);
+
+        storage.fetch = jest.fn().mockImplementation(
+            () => new Promise((resolve => setTimeout(() => resolve(2), 1000)))
+        );
 
         try {
-            await storage.fetchInTimeOrFail('test-123', 500);
-        } catch (data) {
-            expect(data).toBe(undefined);
+            await storage.fetchInTimeOrFail('test', 200);
+        } catch (error) {
+            expect(error instanceof Error).toBe(true);
+            expect(error.name).toBe('TimeoutError');
         }
     });
 });
