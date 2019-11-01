@@ -3,7 +3,4 @@ function promisifySetTimeout(time) {
     return new Promise(resolve => setTimeout(resolve, delay));
 }
 
-console.log('Hello!');
-promisifySetTimeout(3000).then(() => console.log('Hello2!'));
-
 module.exports = promisifySetTimeout;

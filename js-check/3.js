@@ -5,22 +5,19 @@ function replaceLLetters(text) {
 
 function getOLetterPositions(text) {
     const str = typeof text === 'string' ? text : `${text}`;
-    const oLetterPositions = [];
 
-    str.split('').forEach((letter, index) => {
-        if (letter === 'o') {
-            oLetterPositions.push(index + 1);
+    return str.split('').reduce((total, current, index) => {
+        if (current === 'o') {
+            total.push(index + 1);
         }
-    });
 
-    return oLetterPositions;
+        return total;
+    }, []);
 }
 
 function doTask(text) {
     getOLetterPositions(text).forEach(position => console.log(position));
     console.log(replaceLLetters(text));
 }
-
-// console.log(doTask('Hello world!'));
 
 module.exports = { replaceLLetters, getOLetterPositions };

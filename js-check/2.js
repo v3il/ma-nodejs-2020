@@ -70,8 +70,6 @@ function validateUser(user) {
         .every(([propertyName, propertyValidator]) => propertyValidator(user[propertyName]));
 }
 
-console.log(validateUser(user));
-
 module.exports = validateUser;
 
 function isString(data) {
@@ -80,10 +78,6 @@ function isString(data) {
 
 function isNumberBetween0And1(data) {
     return typeof data === 'number' && data >= 0 && data <= 1;
-}
-
-function isNull(data) {
-    return data === null;
 }
 
 function isObject(data) {

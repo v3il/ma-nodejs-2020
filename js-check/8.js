@@ -19,6 +19,4 @@ class Earth extends Planet {
     }
 }
 
-console.log(new Earth().describe());
-
 module.exports = { Planet, Earth };

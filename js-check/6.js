@@ -17,6 +17,4 @@ function getFlatArray(...arrays) {
     return result;
 }
 
-// console.log(getFlatArray([1, 2, 3, 4, 5], [6, 7, 8, 9, 0]));
-
 module.exports = getFlatArray;
