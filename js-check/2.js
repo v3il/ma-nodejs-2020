@@ -77,7 +77,7 @@ function isString(data) {
 }
 
 function isNumberBetween0And1(data) {
-    return typeof data === 'number' && data >= 0 && data <= 1;
+    return typeof data === 'number' && !isNaN(data) && data > 0 && data < 1;
 }
 
 function isObject(data) {
@@ -89,5 +89,5 @@ function isValidPhoneNumberType(type) {
 }
 
 function isValidPhoneNumber(number) {
-    return /^\(555\) 555-\d\d\d\d$/.test(number);
+    return /^\(\d{3}\) \d{3}-\d{4}$/.test(number);
 }

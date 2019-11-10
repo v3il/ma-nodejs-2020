@@ -4,8 +4,8 @@
   "description": "Node.js course",
   "main": "index.js",
   "scripts": {
-    "test:dev": "jest --watch",
-    "test": "jest"
+    "test:dev": "npx jest --watch",
+    "test": "npx jest"
   },
   "repository": {
     "type": "git",
