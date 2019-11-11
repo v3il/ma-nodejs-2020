@@ -84,13 +84,19 @@ describe('2.js', () => {
         userClone.rate = NaN;
         expect(validateUser(userClone)).toBe(false);
 
+        userClone.rate = Infinity;
+        expect(validateUser(userClone)).toBe(false);
+
         userClone.rate = '';
+        expect(validateUser(userClone)).toBe(false);
+
+        userClone.rate = 0;
         expect(validateUser(userClone)).toBe(false);
 
         userClone.rate = 0.01;
         expect(validateUser(userClone)).toBe(true);
 
-        userClone.rate = .99;
+        userClone.rate = 0.99;
         expect(validateUser(userClone)).toBe(true);
 
         userClone.rate = 0.5;
