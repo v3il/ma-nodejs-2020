@@ -1,5 +1,12 @@
-const { task1: getSum, task2: earthInstance, task3: textResolver } = require('./task');
+const { task1: sum, task2: earthInstance, task3 } = require('./task');
 
-console.log(getSum(1, 2, 3));
-console.log(earthInstance.describe());
-textResolver(1000, 'Hello from task3').then(console.log);
+const boot = async () => {
+    console.log(sum);
+
+    const result = await task3;
+    console.log(result);
+
+    console.log(earthInstance.describe());
+};
+
+boot();
