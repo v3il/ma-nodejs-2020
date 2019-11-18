@@ -1,0 +1,23 @@
+{
+    "name": "homework-02",
+    "scripts": {
+        "start": "node src/app.js",
+        "lint": "npx eslint --ignore-path .gitignore .",
+        "lint:fix": "npx eslint --ignore-path .gitignore . --fix"
+    },
+    "author": "Dmitry Kit",
+    "devDependencies": {
+        "eslint": "^6.6.0",
+        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-config-prettier": "^6.5.0",
+        "eslint-plugin-import": "^2.18.2",
+        "eslint-plugin-prettier": "^3.1.1",
+        "husky": "^3.0.9",
+        "prettier": "^1.19.1"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm run lint"
+        }
+    }
+}
