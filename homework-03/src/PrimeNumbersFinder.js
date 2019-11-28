@@ -1,29 +1,28 @@
 module.exports = class PrimeNumbersFinder {
     constructor(startNumber = 1) {
-        let numberToCheck = startNumber;
+        const INITIAL_DIVIDER = 2;
+
         this.biggestFoundNumber = 0;
 
-        setInterval(() => {
-            numberToCheck += 1;
+        let currentDivider = INITIAL_DIVIDER;
+        let numberToCheck = startNumber;
 
-            if (this.checkNumber(numberToCheck)) {
+        setInterval(() => {
+            const currentNumberIsPrime = currentDivider > Math.sqrt(numberToCheck);
+            const stopChecksForCurrentNumber = numberToCheck % currentDivider === 0;
+
+            if (currentNumberIsPrime) {
                 this.biggestFoundNumber = numberToCheck;
             }
-        }, 0);
-    }
 
-    checkNumber(number) {
-        if (!(number % 2)) {
-            return false;
-        }
-
-        for (let i = 3; i <= Math.sqrt(number); i += 2) {
-            if (!(number % i)) {
-                return false;
+            if (currentNumberIsPrime || stopChecksForCurrentNumber) {
+                currentDivider = INITIAL_DIVIDER;
+                numberToCheck += 1;
+            } else {
+                // Skip all even numbers greater than 2
+                currentDivider += (currentDivider === INITIAL_DIVIDER ? 1 : 2);
             }
-        }
-
-        return true;
+        }, 0);
     }
 
     getBiggestFoundNumber() {
