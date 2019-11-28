@@ -1,18 +1,18 @@
-const throwDice = require('./throwDice');
+const throwDice = require('./utils/throwDice');
 
 module.exports = () => {
     console.log('Throwing dices inside callbacks');
 
     setTimeout(() => {
-        throwDice((error, firstThrowResult) => {
-            if (error) {
+        throwDice((firstThrowError, firstThrowResult) => {
+            if (firstThrowError) {
                 console.log('Lost dice');
             } else {
                 console.log(`First throw, got result ${firstThrowResult}`);
 
                 setTimeout(() => {
-                    throwDice((error, secondThrowResult) => {
-                        if (error) {
+                    throwDice((secondThrowError, secondThrowResult) => {
+                        if (secondThrowError) {
                             console.log('Lost dice');
                         } else {
                             console.log(`Second throw, got result ${secondThrowResult}`);
