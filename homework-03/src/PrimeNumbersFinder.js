@@ -8,19 +8,19 @@ module.exports = class PrimeNumbersFinder {
         let numberToCheck = startNumber;
 
         setInterval(() => {
-            const currentNumberIsPrime = currentDivider > Math.sqrt(numberToCheck);
-            const stopChecksForCurrentNumber = numberToCheck % currentDivider === 0;
+            const allDividersChecked = currentDivider > Math.sqrt(numberToCheck);
+            const currentNumberIsNotPrime = numberToCheck % currentDivider === 0;
 
-            if (currentNumberIsPrime) {
+            if (allDividersChecked) {
                 this.biggestFoundNumber = numberToCheck;
             }
 
-            if (currentNumberIsPrime || stopChecksForCurrentNumber) {
+            if (allDividersChecked || currentNumberIsNotPrime) {
                 currentDivider = INITIAL_DIVIDER;
                 numberToCheck += 1;
             } else {
                 // Skip all even numbers greater than 2
-                currentDivider += (currentDivider === INITIAL_DIVIDER ? 1 : 2);
+                currentDivider += currentDivider === INITIAL_DIVIDER ? 1 : 2;
             }
         }, 0);
     }

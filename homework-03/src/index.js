@@ -1,7 +1,7 @@
 const PrimeNumbersFinder = require('./PrimeNumbersFinder');
 
 function run() {
-    const primeNumbersFinder = new PrimeNumbersFinder(9007000); //9007000000000000
+    const primeNumbersFinder = new PrimeNumbersFinder(9007000); // 9007000000000000
 
     setInterval(() => {
         const timestamp = (Date.now() / 1000).toFixed(0);
