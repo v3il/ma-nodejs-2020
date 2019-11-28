@@ -7,7 +7,7 @@ module.exports = class PrimeNumbersFinder {
     constructor(startNumber = 1) {
         this.biggestFoundNumber = 0;
         this.numberToCheck = startNumber;
-        this.latestCheckedDivider = INITIAL_DIVIDER;
+        this.lastCheckedDivider = INITIAL_DIVIDER;
 
         this.runNextTick();
     }
@@ -21,11 +21,11 @@ module.exports = class PrimeNumbersFinder {
             return this.runNextTick();
         }
 
-        // Check odd numbers only
-        for (let i = this.latestCheckedDivider; i <= Math.sqrt(this.numberToCheck); i += 2) {
+        // Check odd dividers only
+        for (let i = this.lastCheckedDivider; i <= Math.sqrt(this.numberToCheck); i += 2) {
             // Time for this iteration is out
             if (performance.now() - start >= CYCLE_MAX_DURATION) {
-                this.latestCheckedDivider = i;
+                this.lastCheckedDivider = i;
                 return this.runNextTick(CYCLE_MAX_DURATION * 2);
             }
 
@@ -49,7 +49,7 @@ module.exports = class PrimeNumbersFinder {
     }
 
     moveToNextNumber() {
-        this.latestCheckedDivider = INITIAL_DIVIDER;
+        this.lastCheckedDivider = INITIAL_DIVIDER;
         this.numberToCheck += 1;
     }
 
