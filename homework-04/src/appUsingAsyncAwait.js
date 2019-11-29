@@ -6,11 +6,11 @@ module.exports = async () => {
 
     try {
         await promisifySetTimeout(700);
-        const firstThrowResult = await throwDice();
+        const firstThrowResult = throwDice();
         console.log(`First throw, got result ${firstThrowResult}`);
 
         await promisifySetTimeout(1300);
-        const secondThrowResult = await throwDice();
+        const secondThrowResult = throwDice();
         console.log(`Second throw, got result ${secondThrowResult}`);
 
         await promisifySetTimeout(1000);
