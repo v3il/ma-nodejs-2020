@@ -1,29 +1,56 @@
+const { performance } = require('perf_hooks');
+
+const INITIAL_DIVIDER = 3;
+const CYCLE_MAX_DURATION = 50;
+
 module.exports = class PrimeNumbersFinder {
     constructor(startNumber = 1) {
-        let numberToCheck = startNumber;
         this.biggestFoundNumber = 0;
+        this.numberToCheck = startNumber;
+        this.lastCheckedDivider = INITIAL_DIVIDER;
 
-        setInterval(() => {
-            numberToCheck += 1;
-
-            if (this.checkNumber(numberToCheck)) {
-                this.biggestFoundNumber = numberToCheck;
-            }
-        }, 0);
+        this.runNextTick();
     }
 
-    checkNumber(number) {
-        if (!(number % 2)) {
-            return false;
+    tick() {
+        const start = performance.now();
+
+        // Even numbers are not prime
+        if (this.numberToCheck % 2 === 0) {
+            this.moveToNextNumber();
+            return this.runNextTick();
         }
 
-        for (let i = 3; i <= Math.sqrt(number); i += 2) {
-            if (!(number % i)) {
-                return false;
+        // Check odd dividers only
+        for (let i = this.lastCheckedDivider; i <= Math.sqrt(this.numberToCheck); i += 2) {
+            // Time for this iteration is out
+            if (performance.now() - start >= CYCLE_MAX_DURATION) {
+                this.lastCheckedDivider = i;
+                return this.runNextTick(CYCLE_MAX_DURATION * 2);
+            }
+
+            // This number is not prime
+            if (this.numberToCheck % i === 0) {
+                this.moveToNextNumber();
+                return this.runNextTick();
             }
         }
 
-        return true;
+        // This number is prime
+        this.biggestFoundNumber = this.numberToCheck;
+        this.moveToNextNumber();
+        return this.runNextTick();
+    }
+
+    runNextTick(delay = 0) {
+        setTimeout(() => {
+            this.tick();
+        }, delay);
+    }
+
+    moveToNextNumber() {
+        this.lastCheckedDivider = INITIAL_DIVIDER;
+        this.numberToCheck += 1;
     }
 
     getBiggestFoundNumber() {
