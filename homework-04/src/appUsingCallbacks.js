@@ -6,14 +6,14 @@ module.exports = () => {
     setTimeout(() => {
         throwDice((firstThrowError, firstThrowResult) => {
             if (firstThrowError) {
-                console.log('Lost dice');
+                console.log(firstThrowError.message);
             } else {
                 console.log(`First throw, got result ${firstThrowResult}`);
 
                 setTimeout(() => {
                     throwDice((secondThrowError, secondThrowResult) => {
                         if (secondThrowError) {
-                            console.log('Lost dice');
+                            console.log(secondThrowError.message);
                         } else {
                             console.log(`Second throw, got result ${secondThrowResult}`);
 

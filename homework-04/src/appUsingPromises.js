@@ -1,25 +1,25 @@
 const { promisify } = require('util');
 
 const throwDice = require('./utils/throwDice');
-const promisifySetTimeout = require('./utils/promisifySetTimeout');
 
-const throwDiceWithPromise = promisify(throwDice);
+const promisifiedThrowDice = promisify(throwDice);
+const promisifiedSetTimeout = promisify(setTimeout);
 
 module.exports = () => {
     console.log('\nThrowing dices inside promises');
 
     Promise.resolve()
         .then(() => {
-            return promisifySetTimeout(700)
-                .then(() => throwDiceWithPromise())
+            return promisifiedSetTimeout(700)
+                .then(() => promisifiedThrowDice())
                 .then(firstThrowResult => {
                     console.log(`First throw, got result ${firstThrowResult}`);
                     return firstThrowResult;
                 });
         })
         .then(firstThrowResult => {
-            return promisifySetTimeout(1300)
-                .then(() => throwDiceWithPromise())
+            return promisifiedSetTimeout(1300)
+                .then(() => promisifiedThrowDice())
                 .then(secondThrowResult => {
                     console.log(`Second throw, got result ${secondThrowResult}`);
                     return [firstThrowResult, secondThrowResult];
@@ -30,7 +30,7 @@ module.exports = () => {
                 console.log(`Points sum is ${firstThrowResult + secondThrowResult}`);
             }, 1000);
         })
-        .catch(() => {
-            console.log('Lost dice');
+        .catch((error) => {
+            console.log(error.message);
         });
 };
