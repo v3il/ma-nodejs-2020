@@ -1,0 +1,1 @@
+Gzipped JSON file should be here

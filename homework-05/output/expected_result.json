@@ -1,0 +1,14 @@
+{
+  "flash": {
+    "file": "./devices/flash-drives.xls",
+    "url": "https://example.com/devices?file=flash-drives&type=.xls"
+  },
+  "keyboard": {
+    "file": "./devices/keyboards.xls",
+    "url": "https://example.com/devices?file=keyboards&type=.xls"
+  },
+  "monitor": {
+    "file": "./devices/monitors.xls",
+    "url": "https://example.com/devices?file=monitors&type=.xls"
+  }
+}
