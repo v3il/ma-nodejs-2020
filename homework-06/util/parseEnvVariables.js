@@ -1,34 +1,18 @@
+const cast = require('../casters');
+
 module.exports = wantedVariables => {
     const variables = {};
 
-    wantedVariables.forEach(({ key, type }) => {
-        const value = process.env[key.toUpperCase()];
+    wantedVariables
+        .filter(({ key }) => !!process.env[key.toUpperCase()])
+        .forEach(({ key, type }) => {
+            const trimmedValue = process.env[key.toUpperCase()].trim();
+            const { parsed, parsedValue } = cast(trimmedValue, type);
 
-        if (!value) {
-            return;
-        }
-
-        const trimmedValue = value.trim();
-        let parsedValue;
-
-        if (type === 'number') {
-            const numericValue = parseFloat(trimmedValue);
-
-            if (!Number.isNaN(numericValue)) {
-                parsedValue = numericValue;
+            if (parsed) {
+                variables[key] = parsedValue;
             }
-        } else if (type === 'boolean') {
-            if (['false', 'true'].includes(trimmedValue)) {
-                parsedValue = trimmedValue === 'true';
-            }
-        } else {
-            parsedValue = trimmedValue;
-        }
-
-        if (parsedValue !== undefined) {
-            variables[key] = parsedValue;
-        }
-    });
+        });
 
     return variables;
 };

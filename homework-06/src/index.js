@@ -57,7 +57,7 @@ const wantedVariables = [
 
 function run() {
     const envVariables = parseEnvVariables(wantedVariables);
-    const argvVariables = parseArgv(process.argv);
+    const argvVariables = parseArgv(process.argv, wantedVariables);
 
     console.log(envVariables);
     console.log(argvVariables);
