@@ -21,16 +21,18 @@ module.exports = (argv, wantedVariables) => {
     const meaningfulParams = argv.slice(2);
     const parsedParams = parseParams(meaningfulParams);
 
-    wantedVariables
-        .filter(({ key }) => parsedParams[key])
-        .forEach(({ key, type }) => {
-            const trimmedValue = parsedParams[key].trim();
+    wantedVariables.forEach(({ key, type }) => {
+        const value = parsedParams[key];
+
+        if (value) {
+            const trimmedValue = value.trim();
             const { parsed, parsedValue } = cast(trimmedValue, type);
 
             if (parsed) {
                 variables[key] = parsedValue;
             }
-        });
+        }
+    });
 
     return variables;
 };
