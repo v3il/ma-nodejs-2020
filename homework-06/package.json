@@ -2,7 +2,7 @@
     "name": "homework-06",
     "main": "src/index.js",
     "scripts": {
-        "start": "node ./src/index.js",
+        "start": "set RATE=1000 && set LIMIT=100 && set COLOR=true && node ./src/index.js --rate=500 --limit=100",
         "lint": "npx eslint --ignore-path .gitignore .",
         "lint:fix": "npx eslint --ignore-path .gitignore . --fix"
     },
