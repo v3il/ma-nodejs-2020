@@ -1,3 +1,3 @@
 const BaseConverter = require('./BaseConverter');
 
-module.exports = BaseConverter;
+module.exports = class EnvVarsConverter extends BaseConverter {};
