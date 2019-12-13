@@ -1,4 +1,4 @@
-const cast = require('../casters');
+const argsVarsConverter = require('./ArgsVarsConverter');
 
 function parseParams(params) {
     const parsedParams = {};
@@ -22,11 +22,12 @@ module.exports = (argv, wantedVariables) => {
     const parsedParams = parseParams(meaningfulParams);
 
     wantedVariables.forEach(({ key, type }) => {
+        // todo
         const value = parsedParams[key];
 
         if (value) {
             const trimmedValue = value.trim();
-            const { parsed, parsedValue } = cast(trimmedValue, type);
+            const { parsed, parsedValue } = argsVarsConverter.convert(trimmedValue, type);
 
             if (parsed) {
                 variables[key] = parsedValue;

@@ -1,4 +1,4 @@
-const cast = require('../casters');
+const envVarsConverter = require('./EnvVarsConverter');
 
 module.exports = wantedVariables => {
     const variables = {};
@@ -8,7 +8,7 @@ module.exports = wantedVariables => {
 
         if (value) {
             const trimmedValue = value.trim();
-            const { parsed, parsedValue } = cast(trimmedValue, type);
+            const { parsed, parsedValue } = envVarsConverter.convert(trimmedValue, type);
 
             if (parsed) {
                 variables[key] = parsedValue;

@@ -1,47 +1,14 @@
-// Написати CLI tool (консольну утиліту) для постійного відслідковування стану заповненості оперативної пам'яті.
-// Програма має видавати 4 значення в термінал (див. скріншоти нижче) у мегабайтах округлених до тисячних (три знаки після коми):
-// - загальна кількість пам'яті в системі,
-// - кількість доступної вільної пам'яті,
-// - кількість зайнятої пам'яті,
-// - різниця кількості зайнятої пам'яті поточного заміру у порівнянні з попереднім заміром (delta).
-// Утиліта має очищати консоль, оновлювати заміри і виводити нові значення в заданому сталому інтервалі.
-//
-//     У якості вхідних параметрів програма має опціонально приймати три параметри через змінні оточення (env vars). При відсутності будь-якого з цих трьох параметрів має братися відповідне значення за замовчуванням:
-//     - RATE - інтервал оновлення замірів в мілісекундах (за замовчуванням 1000),
-// - LIMIT - значення межі інформування про малу кількість вільної пам'яті в мегабайтах (за замовчуванням 300),
-// - COLOR - перемикач (true або false) використання програмою кольорового виведення (за замовчуванням true).
-//
-// Зверніть увагу, що програма також має можливість (що й відбувається за замовчуванням) виводити значення delta та кількість вільної пам'яті певним кольором за наступними умовами (див. скріншоти нижче):
-// - При від'ємному значенні, delta виводиться червоним кольором, інакше — зеленим.
-// - Якщо кількість вільної пам'яті менше заданого ліміту, то це значення має виводитись червоним кольором, а знизу має з'являтись додаткове повідомлення червоним кольором:
-//     !!! ATTENTION: Available memory is under the defined limit !!!
-//
-//     Приклади рядку запуску утиліти:
-//     $ RATE=500 LIMIT=100 node app.js
-// (завантажить програму зі значеннями RATE=500, LIMIT=100, COLOR=true)
-// $ COLOR=false node app.js
-// (завантажить програму зі значеннями RATE=1000, LIMIT=300, COLOR=false)
-// $ COLOR=true LIMIT=1000 node app.js
-// (завантажить програму зі значеннями RATE=1000, LIMIT=1000, COLOR=true)
-//
-// Програма не має використовувати будь-яких сторонніх бібліотек, лише вбудовані модулі Node.js, що ми розглядали під час зустрічі. 🙂
-// В коді у вас буде лише одне підключенння require('os') і все.
-//     Те, що виводить ваша утиліта, має бути повністю аналогічним зображеному на скріншотах.
-// PS: Завдання підвищеної складності "із зірочкою" 🙂
-// Крім змінних оточення (env vars) додатково реалізувати ще отримання тих самих параметрів через аргументи до програми (args) у вигляді flag'ів без використання сторонніх бібліотек:
-// $ node app.js --limit=100
-// (запустить програму зі значеннями RATE=1000, LIMIT=100, COLOR=true)
-// $ node app.js --rate=500 --limit=100
-// (запустить програму зі значеннями RATE=500, LIMIT=100, COLOR=true)
-// $ node app.js --limit=1000 --rate=2000 --color=false
-// (запустить програму зі значеннями RATE=2000, LIMIT=1000, COLOR=false)
-// $ COLOR=false node app.js --limit=100
-// (запустить програму зі значеннями RATE=1000, LIMIT=100, COLOR=false)
-// $ LIMIT=500 COLOR=false node app.js --limit=100
-// (запустить програму зі значеннями RATE=1000, LIMIT=100, COLOR=false, тобто пріоритет надається аргументам)
+const bytesToMb = require('./util/bytesToMb');
+const mbToBytes = require('./util/mbToBytes');
+const colorizeValue = require('./util/colorizeValue');
+const getTotalMemory = require('./util/getTotalMemory');
+const getFreeMemory = require('./util/getFreeMemory');
+const getUsedMemory = require('./util/getUsedMemory');
 
-const parseArgv = require('../util/parseArgv');
-const parseEnvVariables = require('../util/parseEnvVariables');
+const parseArgv = require('./converters/parseArgv');
+const parseEnvVariables = require('./converters/parseEnvVariables');
+
+const { availableColors, precision } = require('./config');
 
 const defaultParams = {
     rate: 1000,
@@ -55,16 +22,87 @@ const wantedVariables = [
     { key: 'color', type: 'boolean' },
 ];
 
+function getColor(colorize, colorResolver) {
+    if (!colorize) {
+        return availableColors.WHITE;
+    }
+
+    return colorResolver();
+}
+
+function printTotalMemory() {
+    const totalMemory = bytesToMb(getTotalMemory()).toFixed(0);
+    console.log(`Total system memory: ${totalMemory}Mb`);
+}
+
+function printFreeMemory(limitInBytes, colorize) {
+    const freeMemory = getFreeMemory();
+    const freeMemoryFormatted = bytesToMb(freeMemory).toFixed(precision);
+
+    const valueColor = getColor(colorize, () =>
+        freeMemory < limitInBytes ? availableColors.RED : availableColors.WHITE,
+    );
+    const colorizedValue = colorizeValue(`${freeMemoryFormatted}Mb`, valueColor);
+
+    console.log(`Free memory available: ${colorizedValue}`);
+}
+
+function printUsedMemory() {
+    const usedMemoryFormatted = bytesToMb(getUsedMemory()).toFixed(precision);
+    console.log(`Allocated memory: ${usedMemoryFormatted}Mb`);
+}
+
+function printMemoryDelta(colorize) {
+    let prevValue = 0;
+
+    return () => {
+        const usedMemory = getUsedMemory();
+        const memoryDelta = usedMemory - prevValue;
+        const formattedDelta = bytesToMb(memoryDelta).toFixed(precision);
+
+        const valueColor = getColor(colorize, () =>
+            memoryDelta < 0 ? availableColors.RED : availableColors.GREEN,
+        );
+        const colorizedValue = colorizeValue(`${formattedDelta}Mb`, valueColor);
+
+        console.log(`Delta for previous allocated memory value: ${colorizedValue}`);
+
+        prevValue = usedMemory;
+    };
+}
+
+function printWarningMessage(limitInBytes, colorize) {
+    if (getFreeMemory() < limitInBytes) {
+        const valueColor = getColor(colorize, () => availableColors.RED);
+        const colorizedValue = colorizeValue(
+            '!!! ATTENTION: Available memory is under the defined limit !!!',
+            valueColor,
+        );
+
+        console.log(colorizedValue);
+    }
+}
+
 function run() {
     const envVariables = parseEnvVariables(wantedVariables);
     const argvVariables = parseArgv(process.argv, wantedVariables);
 
-    console.log(envVariables);
-    console.log(argvVariables);
+    const { rate, limit, color } = { ...defaultParams, ...envVariables, ...argvVariables };
+    const deltaRenderer = printMemoryDelta(color);
 
-    const params = { ...defaultParams, ...envVariables, ...argvVariables };
+    const limitInBytes = mbToBytes(limit);
 
-    console.log(params);
+    setInterval(() => {
+        console.clear();
+
+        console.log(rate, limit);
+
+        printTotalMemory();
+        printFreeMemory(limitInBytes, color);
+        printUsedMemory();
+        deltaRenderer();
+        printWarningMessage(limitInBytes, color);
+    }, rate);
 }
 
 run();
