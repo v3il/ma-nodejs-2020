@@ -1,43 +1,36 @@
+/* eslint-disable class-methods-use-this */
 module.exports = class BaseConverter {
     convertToBoolean(value) {
         if (['false', 'true'].includes(value)) {
-            return this.generateSuccessfulParsingResponse(value === 'true');
+            return { parsed: true, parsedValue: value === 'true' };
         }
 
-        return this.generateFailedParsingResponse();
+        return { parsed: false };
     }
 
     convertToNumber(value) {
         const numericValue = parseFloat(value);
 
         if (!Number.isNaN(numericValue)) {
-            return this.generateSuccessfulParsingResponse(numericValue);
+            return { parsed: true, parsedValue: numericValue };
         }
 
-        return this.generateFailedParsingResponse();
+        return { parsed: false };
     }
 
     convertToString(value) {
-        return this.generateSuccessfulParsingResponse(value);
+        return { parsed: true, parsedValue: value };
     }
 
-    convert(value, type) {
-        if (type === 'number') {
+    convert(value, expectedType) {
+        if (expectedType === 'number') {
             return this.convertToNumber(value);
         }
 
-        if (type === 'boolean') {
+        if (expectedType === 'boolean') {
             return this.convertToBoolean(value);
         }
 
         return this.convertToString(value);
-    }
-
-    static generateSuccessfulParsingResponse(value) {
-        return { parsed: true, parsedValue: value };
-    }
-
-    static generateFailedParsingResponse() {
-        return { parsed: false };
     }
 };

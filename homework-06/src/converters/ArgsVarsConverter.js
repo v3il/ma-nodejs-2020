@@ -2,9 +2,9 @@ const BaseConverter = require('./BaseConverter');
 
 class ArgsVarsConverter extends BaseConverter {
     convertToBoolean(value) {
-        // --some-key -> true
+        // --some-key (without value) should be converted to `true`
         if (!value.length) {
-            return this.generateSuccessfulParsingResponse(true);
+            return { parsed: true, parsedValue: true };
         }
 
         return super.convertToBoolean(value);

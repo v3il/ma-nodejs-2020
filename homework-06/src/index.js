@@ -17,9 +17,9 @@ const defaultParams = {
 };
 
 const wantedVariables = [
-    { key: 'rate', type: 'number' },
-    { key: 'limit', type: 'number' },
-    { key: 'color', type: 'boolean' },
+    { key: 'rate', expectedType: 'number' },
+    { key: 'limit', expectedType: 'number' },
+    { key: 'color', expectedType: 'boolean' },
 ];
 
 function getColor(colorize, colorResolver) {
@@ -95,7 +95,7 @@ function run() {
     setInterval(() => {
         console.clear();
 
-        console.log(rate, limit);
+        console.log(rate, limit, color);
 
         printTotalMemory();
         printFreeMemory(limitInBytes, color);
