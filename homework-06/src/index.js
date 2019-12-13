@@ -88,21 +88,26 @@ function run() {
     const argvVariables = parseArgv(process.argv, wantedVariables);
 
     const { rate, limit, color } = { ...defaultParams, ...envVariables, ...argvVariables };
-    const deltaRenderer = printMemoryDelta(color);
 
+    const deltaRenderer = printMemoryDelta(color);
     const limitInBytes = mbToBytes(limit);
 
-    setInterval(() => {
+    const tick = () => {
         console.clear();
 
-        console.log(rate, limit, color);
+        console.log(
+            colorizeValue(`Rate: ${rate}, Limit: ${limit}, Color: ${color}`, availableColors.RED),
+        );
 
         printTotalMemory();
         printFreeMemory(limitInBytes, color);
         printUsedMemory();
         deltaRenderer();
         printWarningMessage(limitInBytes, color);
-    }, rate);
+    };
+
+    tick();
+    setInterval(tick, rate);
 }
 
 run();
