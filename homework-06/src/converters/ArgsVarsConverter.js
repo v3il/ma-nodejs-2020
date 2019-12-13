@@ -11,4 +11,4 @@ class ArgsVarsConverter extends BaseConverter {
     }
 }
 
-module.exports = new ArgsVarsConverter();
+module.exports = ArgsVarsConverter;

@@ -5,7 +5,7 @@ const getTotalMemory = require('./util/getTotalMemory');
 const getFreeMemory = require('./util/getFreeMemory');
 const getUsedMemory = require('./util/getUsedMemory');
 
-const parseArgv = require('./converters/parseArgv');
+const { parseArgv } = require('./converters/parseArgv');
 const parseEnvVariables = require('./converters/parseEnvVariables');
 
 const { availableColors, precision } = require('./config');

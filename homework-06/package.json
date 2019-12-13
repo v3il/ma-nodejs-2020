@@ -5,7 +5,9 @@
         "dev": "set RATE=1000 && set LIMIT=100 && set COLOR=true && nodemon ./src/index.js --rate=500 --limit=100",
         "start": "set RATE=1000 && set LIMIT=100 && set COLOR=true && node ./src/index.js --rate=500 --limit=100",
         "lint": "npx eslint --ignore-path .gitignore .",
-        "lint:fix": "npx eslint --ignore-path .gitignore . --fix"
+        "lint:fix": "npx eslint --ignore-path .gitignore . --fix",
+        "test:dev": "jest --no-cache --watch",
+        "test": "jest --no-cache --silent"
     },
     "author": "Dmitry Kit",
     "devDependencies": {
@@ -15,12 +17,13 @@
         "eslint-plugin-import": "^2.18.2",
         "eslint-plugin-prettier": "^3.1.1",
         "husky": "^3.0.9",
+        "jest": "^24.9.0",
         "nodemon": "^2.0.2",
         "prettier": "^1.19.1"
     },
     "husky": {
         "hooks": {
-            "pre-commit": "npm run lint:fix && cd .. && git add ."
+            "pre-commit": "npm run lint:fix && npm run test && cd .. && git add ."
         }
     }
 }
