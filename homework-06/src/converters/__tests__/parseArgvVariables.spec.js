@@ -1,4 +1,4 @@
-const { parseArgv, parseParams } = require('../parseArgv');
+const { parseArgvVariables, parseParams } = require('../parseArgvVariables');
 
 describe('parseParams', () => {
     it('extracts variables with dashes', () => {
@@ -30,7 +30,7 @@ describe('parseArgv', () => {
             { key: 'colorize', expectedType: 'boolean' },
         ];
 
-        expect(parseArgv(params, wantedVariables)).toStrictEqual({
+        expect(parseArgvVariables(params, wantedVariables)).toStrictEqual({
             rate: 500,
             colorize: true,
             'fetch-delay': '300',
@@ -46,7 +46,7 @@ describe('parseArgv', () => {
             { key: 'colorize', expectedType: 'number' },
         ];
 
-        expect(parseArgv(params, wantedVariables)).toStrictEqual({
+        expect(parseArgvVariables(params, wantedVariables)).toStrictEqual({
             rate: 500,
         });
     });
@@ -60,7 +60,7 @@ describe('parseArgv', () => {
             { key: 'test', expectedType: 'string' },
         ];
 
-        expect(parseArgv(params, wantedVariables)).toStrictEqual({
+        expect(parseArgvVariables(params, wantedVariables)).toStrictEqual({
             rate: 500,
         });
     });

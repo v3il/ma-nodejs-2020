@@ -1,4 +1,4 @@
-const EnvVarsConverter = require('./EnvVarsConverter');
+const { convertEnvValue } = require('./valuesConverter');
 
 /**
  * Retrieves by key all requested variables from process.env and casts the value to needed type.
@@ -7,14 +7,12 @@ const EnvVarsConverter = require('./EnvVarsConverter');
  * @returns {Object} - object which stores all extracted variables and their parsed values
  */
 module.exports = wantedVariables => {
-    const converter = new EnvVarsConverter();
-
     return wantedVariables.reduce((variables, { key, expectedType }) => {
         const value = process.env[key.toUpperCase()];
 
         if (value !== undefined) {
             const trimmedValue = value.trim();
-            const { parsed, parsedValue } = converter.convert(trimmedValue, expectedType);
+            const { parsed, parsedValue } = convertEnvValue(trimmedValue, expectedType);
 
             // Skip this variable if value can't be represented as `expectedType` type
             if (parsed) {

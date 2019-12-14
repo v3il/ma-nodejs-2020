@@ -1,4 +1,4 @@
-const ArgsVarsConverter = require('./ArgsVarsConverter');
+const { convertArgvValue } = require('./valuesConverter');
 
 /**
  * Extracts from passed script's arguments key and value of each param and puts them into one object
@@ -21,9 +21,7 @@ function parseParams(params) {
  * @param wantedVariables {Object[]} - description of wanted variables. Each object should has `key` and `expectedType` keys
  * @returns {Object} - object which stores all extracted variables and their parsed values
  */
-function parseArgv(argv, wantedVariables) {
-    const converter = new ArgsVarsConverter();
-
+function parseArgvVariables(argv, wantedVariables) {
     const meaningfulParams = argv.slice(2);
     const parsedParams = parseParams(meaningfulParams);
 
@@ -32,7 +30,7 @@ function parseArgv(argv, wantedVariables) {
 
         if (value !== undefined) {
             const trimmedValue = value.trim();
-            const { parsed, parsedValue } = converter.convert(trimmedValue, expectedType);
+            const { parsed, parsedValue } = convertArgvValue(trimmedValue, expectedType);
 
             // Skip this variable if value can't be represented as `expectedType` type
             if (parsed) {
@@ -44,4 +42,4 @@ function parseArgv(argv, wantedVariables) {
     }, {});
 }
 
-module.exports = { parseParams, parseArgv };
+module.exports = { parseParams, parseArgvVariables };
