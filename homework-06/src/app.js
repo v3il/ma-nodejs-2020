@@ -1,13 +1,10 @@
 const { bytesToMb, mbToBytes } = require('./util/spaceConverters');
 const { getTotalMemory, getFreeMemory, getUsedMemory } = require('./util/memory');
-
-const { parseArgvVariables } = require('./converters/parseArgvVariables');
-const parseEnvVariables = require('./converters/parseEnvVariables');
+const { parseArgvVariables, parseEnvVariables } = require('./converters');
 
 const Printer = require('./Printer');
 
 let printer;
-
 const PRECISION = 3;
 
 function printTotalMemory() {
