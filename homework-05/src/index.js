@@ -20,11 +20,11 @@ async function getInputFileList() {
 
     try {
         fileNames = await fsp.readdir(inputDir);
+        return fileNames.map(fileName => path.join(inputDir, fileName));
     } catch (error) {
-        console.error(`Can't read the directory ${inputDir}`);
+        console.error(error);
+        throw `Can't read the directory ${inputDir}`;
     }
-
-    return fileNames.map(fileName => path.join(inputDir, fileName));
 }
 
 async function getObjectFromFile(filePath) {
@@ -33,7 +33,8 @@ async function getObjectFromFile(filePath) {
     try {
         compressedBuffer = await fsp.readFile(filePath);
     } catch (error) {
-        console.error(`An error occurred while reading the file "${filePath}"`, error);
+        console.error(error);
+        throw `An error occurred while reading the file "${filePath}"`;
     }
 
     let buffer;
@@ -41,13 +42,15 @@ async function getObjectFromFile(filePath) {
     try {
         buffer = await gunzip(compressedBuffer);
     } catch (error) {
-        console.error('An error occurred during data decompression', error);
+        console.error(error);
+        throw 'An error occurred during data decompression';
     }
 
     try {
         return JSON.parse(buffer);
     } catch (error) {
-        console.error(`File "${filePath}" contains invalid JSON data`);
+        console.error(error);
+        throw `File "${filePath}" contains invalid JSON data`;
     }
 
     return {};
@@ -76,10 +79,8 @@ async function buildOutputObject(files) {
             // eslint-disable-next-line
             fileObject = await getObjectFromFile(filePath);
         } catch (error) {
-            console.error(
-                `An error occurred while reading the content of file "${filePath}"`,
-                error,
-            );
+            console.error(error);
+            throw `An error occurred while reading the content of file "${filePath}"`;
         }
 
         fileObject.url = rebuildUrl(fileObject.url);
@@ -102,19 +103,22 @@ async function saveOutput(object) {
     try {
         compressedBuffer = await gzip(uncompressedBuffer);
     } catch (error) {
-        console.error('An error occurred during data compression', error);
+        console.error(error);
+        throw 'An error occurred during data compression';
     }
 
     try {
         await fsp.writeFile(outputFile, compressedBuffer);
     } catch (error) {
-        console.error(`An error occurred while writing the file "${outputFileName}"`, error);
+        console.error(error);
+        throw `An error occurred while writing the file "${outputFileName}"`;
     }
 
     try {
         await fsp.writeFile(outputTextFile, JSON.stringify(object, null, 4));
     } catch (error) {
-        console.error(`An error occurred while writing the file "${outputTextFileName}"`, error);
+        console.error(error);
+        throw `An error occurred while writing the file "${outputTextFileName}"`;
     }
 }
 
