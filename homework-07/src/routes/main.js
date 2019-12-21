@@ -1,11 +1,15 @@
-const router = require('../Router');
-
 const { readAsset } = require('../util');
 
-const mainPageFileContent = readAsset('index.html');
+module.exports = router => {
+    router.get('/', async (request, response) => {
+        try {
+            const content = await readAsset('index.html');
 
-router.get('/', (request, response) => {
-    response.setHeader('Content-Type', 'text/html');
-    response.write(mainPageFileContent);
-    response.end();
-});
+            response.setHeader('Content-Type', 'text/html');
+            response.write(content);
+            response.end();
+        } catch (error) {
+            console.error('index.html does not exist');
+        }
+    });
+};

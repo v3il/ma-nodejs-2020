@@ -1,11 +1,15 @@
-const router = require('../Router');
-
 const { readAsset } = require('../util');
 
-const page404FileContent = readAsset('404.html');
+module.exports = router => {
+    router.get('/404', async (request, response) => {
+        try {
+            const content = await readAsset('404.html');
 
-router.get('/404', (request, response) => {
-    response.setHeader('Content-Type', 'text/html');
-    response.write(page404FileContent);
-    response.end();
-});
+            response.setHeader('Content-Type', 'text/html');
+            response.write(content);
+            response.end();
+        } catch (error) {
+            console.error('404.html does not exist');
+        }
+    });
+};

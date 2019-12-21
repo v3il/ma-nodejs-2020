@@ -32,8 +32,6 @@ class Router {
         const parsedUrl = new URL(`http://${headers.host}${url}`);
         request.parsedUrl = parsedUrl;
 
-        console.log(parsedUrl);
-
         if (method === 'POST') {
             try {
                 request.body = await this.getRequestBody(request);
@@ -56,15 +54,20 @@ class Router {
         const routeHandlers = routesCollection[parsedUrl.pathname];
 
         if (routeHandlers) {
-            let processed = false;
-
             // eslint-disable-next-line no-restricted-syntax
             for (const handler of routeHandlers) {
-                // eslint-disable-next-line no-await-in-loop
-                processed = await handler(request, response);
+                try {
+                    // eslint-disable-next-line no-await-in-loop
+                    const breakRouteHandlersExecution = await handler(request, response);
 
-                if (processed) {
-                    break;
+                    if (breakRouteHandlersExecution === true) {
+                        break;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    response.sendJSON(500, {
+                        message: http.STATUS_CODES[500],
+                    });
                 }
             }
         } else if (method === 'GET') {
@@ -96,7 +99,7 @@ class Router {
                 if (body.length) {
                     try {
                         resolve(JSON.parse(body));
-                    } catch (e) {
+                    } catch (error) {
                         reject(new Error('Bad JSON'));
                     }
                 } else {

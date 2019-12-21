@@ -1,7 +1,9 @@
 const http = require('http');
 
 const router = require('./Router');
-require('./routes');
+const setupRoutes = require('./routes');
+
+setupRoutes(router);
 
 const PORT = 3000;
 
