@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main page</title>
+</head>
+<body>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        background-color: #2d2d2d;
+        color: #bdbdbd;
+    }
+
+    label {
+        display: block;
+        cursor: pointer;
+    }
+
+    button {
+        background-color: forestgreen;
+        color: white;
+        border: 1px solid forestgreen;
+        padding: 3px 6px;
+        cursor: pointer;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    h3 {
+        margin: 6px 0;
+    }
+
+    select, input[type='number'] {
+        border: 1px solid #555;
+        height: 24px;
+        width: 200px;
+        padding: 0 12px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .container__header {
+        padding: 6px 12px;
+    }
+
+    .container__auth-block {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .container__forms {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0 12px;
+        justify-content: space-between;
+    }
+
+    .container__form {
+        flex-basis: 49%;
+    }
+
+    .container__log-container {
+        height: 200px;
+        margin-top: 12px;
+        padding: 6px 12px;
+    }
+
+    .container__log-element {
+        margin-top: 6px;
+        padding: 12px;
+        border: 1px solid #ccc;
+    }
+
+    pre.success {
+        color: lightgreen;
+    }
+
+    pre.error {
+        color: lightcoral;
+    }
+</style>
+
+<div class="container">
+    <div class="container__header">
+        <h1>Main page</h1>
+    </div>
+
+    <div class="container__auth-block">
+        <label><input type="checkbox" id="add-auth-header" checked>Add auth header</label>
+    </div>
+
+    <div class="container__forms">
+        <div class="container__form">
+            <h3>Get metrics</h3>
+
+            <select name="filter" id="filter">
+                <option value="all">All metrics</option>
+                <option value="total">Total</option>
+                <option value="free">Free</option>
+                <option value="allocated">Allocated</option>
+                <option value="bad">Bad filter</option>
+            </select>
+
+            <button id="get-values">Get values</button>
+        </div>
+
+        <div class="container__form">
+            <h3>Change memory limit</h3>
+            <input id="limit" type="number" value="300">
+            <button id="change-limit">Change</button>
+        </div>
+    </div>
+
+    <div class="container__log-container">
+        <h3>Last response</h3>
+
+        <div class="container__log-element" id="log">&mdash;</div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const limitInput = document.getElementById('limit');
+        const changeLimitButton = document.getElementById('change-limit');
+        const getMetricsButton = document.getElementById('get-values');
+        const filterSelect = document.getElementById('filter');
+        const addAuthHeaderCheckbox = document.getElementById('add-auth-header');
+        const logElement = document.getElementById('log');
+
+        const credentials = btoa('Dmitry | My secret password');
+
+        changeLimitButton.addEventListener('click', event => {
+            const newLimit = limitInput.value;
+
+            const headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            };
+
+            if (addAuthHeaderCheckbox.checked) {
+                headers.Authorization = `Basic ${credentials}`;
+            }
+
+            fetch('/limit', {
+                headers,
+                method: 'POST',
+                body: JSON.stringify({ limit: newLimit }),
+            })
+                .then(async response => {
+                    const json = await response.json();
+                    const elClass = response.status === 200 ? 'success' : 'error';
+                    logElement.innerHTML = `<pre class="${elClass}">${JSON.stringify(json, null, 2)}</pre>`;
+                });
+        });
+
+        getMetricsButton.addEventListener('click', event => {
+            const filterValue = filterSelect.value;
+
+            const filterSearchParam = filterValue === 'all' ? '' : `?filter=${filterValue}`;
+
+            const headers = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            };
+
+            if (addAuthHeaderCheckbox.checked) {
+                headers.Authorization = `Basic ${credentials}`;
+            }
+
+            fetch(`/metrics${filterSearchParam}`, {
+                headers,
+                method: 'GET',
+            })
+                .then(async response => {
+                    const json = await response.json();
+                    const elClass = response.status === 200 ? 'success' : 'error';
+                    logElement.innerHTML = `<pre class="${elClass}">${JSON.stringify(json, null, 2)}</pre>`;
+                });
+        });
+    })();
+</script>
+</body>
+</html>
