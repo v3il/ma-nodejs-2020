@@ -1,9 +1,10 @@
 const http = require('http');
 
-const dispatcher = require('./controller');
+const router = require('./Router');
+require('./routes');
 
 const PORT = 3000;
 
-http.createServer(dispatcher).listen(PORT, () =>
-    console.log(`Server is listening at port ${PORT}`),
-);
+http.createServer(async (request, response) => {
+    await router.resolve(request, response);
+}).listen(PORT);

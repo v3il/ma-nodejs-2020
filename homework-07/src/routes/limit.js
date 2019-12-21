@@ -1,7 +1,7 @@
 const router = require('../Router');
 
 const { authGuard } = require('../guards');
-const { updateConfig, getConfig } = require('../config');
+const { updateConfig } = require('../config');
 
 router.post('/limit', authGuard, (request, response) => {
     const { limit } = request.body;
@@ -20,6 +20,4 @@ router.post('/limit', authGuard, (request, response) => {
             message: `Minimum free memory limit is successfully set to ${numericLimit} MB`,
         });
     }
-
-    console.log(getConfig());
 });

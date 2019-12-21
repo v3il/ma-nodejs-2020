@@ -23,7 +23,7 @@
         cursor: pointer;
     }
 
-    button {
+    button, a {
         background-color: forestgreen;
         color: white;
         border: 1px solid forestgreen;
@@ -31,6 +31,7 @@
         cursor: pointer;
         height: 24px;
         flex-shrink: 0;
+        text-decoration: none;
     }
 
     h3 {
@@ -41,7 +42,6 @@
         border: 1px solid #555;
         height: 24px;
         width: 200px;
-        padding: 0 12px;
     }
 
     .container {
@@ -49,19 +49,15 @@
         margin: 0 auto;
     }
 
-    .container__header {
-        padding: 6px 12px;
-    }
-
     .container__auth-block {
         width: 100%;
-        padding: 12px;
+        padding: 12px 0;
     }
 
     .container__forms {
         display: flex;
         flex-wrap: wrap;
-        padding: 0 12px;
+        /*padding: 0 12px;*/
         justify-content: space-between;
     }
 
@@ -72,7 +68,7 @@
     .container__log-container {
         height: 200px;
         margin-top: 12px;
-        padding: 6px 12px;
+        padding: 6px 0;
     }
 
     .container__log-element {
@@ -87,6 +83,10 @@
 
     pre.error {
         color: lightcoral;
+    }
+
+    .container__bad-actions {
+        margin: 12px 0;
     }
 </style>
 
@@ -111,7 +111,7 @@
                 <option value="bad">Bad filter</option>
             </select>
 
-            <button id="get-values">Get values</button>
+            <button id="get-values">Get metrics</button>
         </div>
 
         <div class="container__form">
@@ -119,6 +119,11 @@
             <input id="limit" type="number" value="300">
             <button id="change-limit">Change</button>
         </div>
+    </div>
+
+    <div class="container__bad-actions">
+        <a href="/test">Nav to not existing page</a>
+        <button id="bad-api">Send bad API request</button>
     </div>
 
     <div class="container__log-container">
@@ -136,6 +141,7 @@
         const filterSelect = document.getElementById('filter');
         const addAuthHeaderCheckbox = document.getElementById('add-auth-header');
         const logElement = document.getElementById('log');
+        const sendBadApiRequestBtn = document.getElementById('bad-api');
 
         const credentials = btoa('Dmitry | My secret password');
 
@@ -180,6 +186,17 @@
             fetch(`/metrics${filterSearchParam}`, {
                 headers,
                 method: 'GET',
+            })
+                .then(async response => {
+                    const json = await response.json();
+                    const elClass = response.status === 200 ? 'success' : 'error';
+                    logElement.innerHTML = `<pre class="${elClass}">${JSON.stringify(json, null, 2)}</pre>`;
+                });
+        });
+
+        sendBadApiRequestBtn.addEventListener('click', event => {
+            fetch('/bad-url', {
+                method: 'POST',
             })
                 .then(async response => {
                     const json = await response.json();

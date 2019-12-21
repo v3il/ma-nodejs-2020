@@ -6,17 +6,34 @@
 </head>
 <body>
 <style>
-    .root {
-        text-align: center;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
 
-    h1 {
-        color: blue;
+    html, body {
+        background-color: #2d2d2d;
+        color: #bdbdbd;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    a {
+        color: lightcoral;
+        display: inline-block;
+        margin: 12px 0;
     }
 </style>
 
-<div class="root">
-    <h1>404 page</h1>
+<div class="container">
+    <div class="container__header">
+        <h1>404 page</h1>
+    </div>
+
     <a href="/">Return to main page</a>
 </div>
 </body>

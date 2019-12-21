@@ -1,3 +1,5 @@
+const http = require('http');
+
 class Router {
     constructor() {
         this.routes = {
@@ -36,9 +38,9 @@ class Router {
             try {
                 request.body = await this.getRequestBody(request);
             } catch (error) {
-                console.error(error.message);
-                response.sendJSON(400, {
-                    message: 'Bad request',
+                console.error(123, error.message);
+                return response.sendJSON(400, {
+                    message: error.message,
                 });
             }
         }
@@ -56,18 +58,25 @@ class Router {
         if (routeHandlers) {
             let processed = false;
 
-            routeHandlers.forEach(handler => {
-                if (!processed) {
-                    processed = !!handler(request, response);
+            // eslint-disable-next-line no-restricted-syntax
+            for (const handler of routeHandlers) {
+                // eslint-disable-next-line no-await-in-loop
+                processed = await handler(request, response);
+
+                if (processed) {
+                    break;
                 }
-            });
+            }
         } else if (method === 'GET') {
             response.redirect('/404');
         } else {
             response.sendJSON(404, {
-                message: 'Not found',
+                url: parsedUrl.pathname,
+                message: http.STATUS_CODES[404],
             });
         }
+
+        return true;
     }
 
     // eslint-disable-next-line class-methods-use-this
@@ -79,12 +88,20 @@ class Router {
                 body += data;
 
                 if (body.length > 1e6) {
-                    reject();
+                    reject(new Error(http.STATUS_CODES[413]));
                 }
             });
 
             request.on('end', () => {
-                resolve(JSON.parse(body));
+                if (body.length) {
+                    try {
+                        resolve(JSON.parse(body));
+                    } catch (e) {
+                        reject(new Error('Bad JSON'));
+                    }
+                } else {
+                    resolve({});
+                }
             });
         });
     }
