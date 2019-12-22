@@ -17,7 +17,6 @@
 
     function getHeaders() {
         const headers = {
-            Accept: 'application/json',
             'Content-Type': 'application/json',
         };
 
@@ -30,10 +29,9 @@
 
     changeLimitButton.addEventListener('click', () => {
         const newLimit = limitInput.value;
-        const headers = getHeaders();
 
         fetch('/limit', {
-            headers,
+            headers: getHeaders(),
             method: 'POST',
             body: JSON.stringify({ limit: newLimit }),
         }).then(processResponse);
@@ -42,10 +40,9 @@
     getMetricsButton.addEventListener('click', () => {
         const filterValue = filterSelect.value;
         const filterSearchParam = filterValue === 'all' ? '' : `?filter=${filterValue}`;
-        const headers = getHeaders();
 
         fetch(`/metrics${filterSearchParam}`, {
-            headers,
+            headers: getHeaders(),
             method: 'GET',
         }).then(processResponse);
     });

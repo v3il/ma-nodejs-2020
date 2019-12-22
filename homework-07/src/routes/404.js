@@ -1,4 +1,5 @@
-const { readAsset } = require('../util');
+const http = require('http');
+const readAsset = require('../util/readAsset');
 
 module.exports = router => {
     router.get('/404', async (request, response) => {
@@ -10,6 +11,11 @@ module.exports = router => {
             response.end();
         } catch (error) {
             console.error('404.html does not exist');
+
+            response.sendJSON(404, {
+                url: '/404',
+                message: http.STATUS_CODES[404],
+            });
         }
     });
 };

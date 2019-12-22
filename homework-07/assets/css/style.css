@@ -5,8 +5,8 @@
 }
 
 html, body {
-    background-color: #2d2d2d;
-    color: #bdbdbd;
+    background-color: #2c2e32;
+    color: #a4a6aa;
 }
 
 label {
@@ -23,6 +23,9 @@ button, a {
     height: 24px;
     flex-shrink: 0;
     text-decoration: none;
+    display: inline-block;
+    margin: 3px 0;
+    line-height: 14px;
 }
 
 h3 {
@@ -32,7 +35,7 @@ h3 {
 select, input[type='number'] {
     border: 1px solid #555;
     height: 24px;
-    width: 200px;
+    width: 300px;
 }
 
 .container {
@@ -40,8 +43,17 @@ select, input[type='number'] {
     margin: 0 auto;
 }
 
-.container__auth-block {
-    width: 100%;
+.container__header {
+    padding: 6px;
+    border-bottom: 1px solid #ccc;
+}
+
+.container__content {
+    padding: 6px;
+    margin-top: 12px;
+}
+
+.container__block {
     padding: 12px 0;
 }
 
@@ -55,14 +67,7 @@ select, input[type='number'] {
     flex-basis: 49%;
 }
 
-.container__log-container {
-    height: 200px;
-    margin-top: 12px;
-    padding: 6px 0;
-}
-
 .container__log-element {
-    margin-top: 6px;
     padding: 12px;
     border: 1px solid #ccc;
 }

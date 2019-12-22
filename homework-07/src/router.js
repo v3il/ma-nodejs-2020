@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 const http = require('http');
 
-const { readAsset } = require('./util');
+const readAsset = require('./util/readAsset');
 
 class Router {
     constructor() {
@@ -35,7 +35,7 @@ class Router {
         const parsedUrl = new URL(`http://${headers.host}${url}`);
         request.parsedUrl = parsedUrl;
 
-        if (/.(css|js)$/.test(parsedUrl.pathname) && method === 'GET') {
+        if (/.(css|js|ico)$/.test(parsedUrl.pathname) && method === 'GET') {
             await this.resolveStatic(request, response);
         } else {
             try {
@@ -44,7 +44,7 @@ class Router {
             } catch (error) {
                 console.error(error);
 
-                response.sendJSON(400, {
+                response.sendJSON(500, {
                     message: error.message,
                 });
             }
@@ -80,19 +80,26 @@ class Router {
     async resolveStatic(request, response) {
         const { parsedUrl } = request;
 
-        console.log(parsedUrl.pathname);
-        const resourceContent = await readAsset(parsedUrl.pathname.slice(1));
+        try {
+            const resourceContent = await readAsset(parsedUrl.pathname.slice(1));
 
-        if (parsedUrl.pathname.endsWith('.css')) {
-            response.setHeader('Content-Type', 'text/css');
+            if (parsedUrl.pathname.endsWith('.css')) {
+                response.setHeader('Content-Type', 'text/css');
+            }
+
+            if (parsedUrl.pathname.endsWith('.js')) {
+                response.setHeader('Content-Type', 'application/javascript');
+            }
+
+            response.write(resourceContent);
+            response.end();
+        } catch (error) {
+            console.error(error);
+
+            response.sendJSON(404, {
+                message: http.STATUS_CODES[404],
+            });
         }
-
-        if (parsedUrl.pathname.endsWith('.js')) {
-            response.setHeader('Content-Type', 'application/javascript');
-        }
-
-        response.write(resourceContent);
-        return response.end();
     }
 
     async resolveRoute(request, response) {
@@ -116,6 +123,7 @@ class Router {
 
                     response.sendJSON(500, {
                         message: http.STATUS_CODES[500],
+                        details: error.message,
                     });
                 }
             }

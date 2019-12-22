@@ -1,6 +1,6 @@
 const http = require('http');
 
-const router = require('./Router');
+const router = require('./router');
 const setupRoutes = require('./routes');
 
 setupRoutes(router);

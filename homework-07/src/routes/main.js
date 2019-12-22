@@ -1,4 +1,4 @@
-const { readAsset } = require('../util');
+const readAsset = require('../util/readAsset');
 
 module.exports = router => {
     router.get('/', async (request, response) => {
@@ -10,6 +10,7 @@ module.exports = router => {
             response.end();
         } catch (error) {
             console.error('index.html does not exist');
+            response.redirect('/404');
         }
     });
 };

@@ -4,53 +4,55 @@
     <meta charset="UTF-8">
     <title>Main page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="container">
-    <div class="container__header">
+    <header class="container__header">
         <h1>Main page</h1>
-    </div>
+    </header>
 
-    <div class="container__auth-block">
-        <label><input type="checkbox" id="add-auth-header" checked>Add auth header</label>
-    </div>
-
-    <div class="container__forms">
-        <div class="container__form">
-            <h3>Get metrics</h3>
-
-            <select name="filter" id="filter">
-                <option value="all">All metrics</option>
-                <option value="total">Total</option>
-                <option value="free">Free</option>
-                <option value="allocated">Allocated</option>
-                <option value="bad">Bad filter</option>
-            </select>
-
-            <button id="get-values">Get metrics</button>
+    <main class="container__content">
+        <div class="container__block">
+            <label><input type="checkbox" id="add-auth-header" checked>Add auth header</label>
         </div>
 
-        <div class="container__form">
-            <h3>Change memory limit</h3>
-            <input id="limit" type="number" value="300">
-            <button id="change-limit">Change</button>
+        <div class="container__block container__forms">
+            <div class="container__form">
+                <h3>Get metrics</h3>
+
+                <select name="filter" id="filter">
+                    <option value="all">All metrics</option>
+                    <option value="total">Total</option>
+                    <option value="free">Free</option>
+                    <option value="allocated">Allocated</option>
+                    <option value="bad">Bad filter</option>
+                </select>
+
+                <button id="get-values">Get metrics</button>
+            </div>
+
+            <div class="container__form">
+                <h3>Change memory limit</h3>
+                <input id="limit" type="number" value="300">
+                <button id="change-limit">Change</button>
+            </div>
         </div>
-    </div>
 
-    <div class="container__bad-actions">
-        <a href="/test">Nav to not existing page</a>
-        <button id="bad-api">Send bad API request</button>
-    </div>
+        <div class="container__block">
+            <a href="/bad-url">Nav to not existing page</a>
+            <button id="bad-api">Send bad API request</button>
+        </div>
 
-    <div class="container__log-container">
-        <h3>Last response</h3>
+        <div class="container__block">
+            <h3>Last response</h3>
 
-        <div class="container__log-element" id="log">&mdash;</div>
-    </div>
+            <div class="container__log-element" id="log">&mdash;</div>
+        </div>
+    </main>
 </div>
 
-<script src="script.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>
