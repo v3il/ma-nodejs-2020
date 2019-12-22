@@ -1,6 +1,6 @@
 const { getConfig } = require('../config');
 
-module.exports = async (request, response) => {
+module.exports = (request, response) => {
     const { authToken } = getConfig();
     const { authorization: authHeader } = request.headers;
 

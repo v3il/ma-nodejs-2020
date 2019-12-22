@@ -1,4 +1,7 @@
+/* eslint-disable class-methods-use-this */
 const http = require('http');
+
+const { readAsset } = require('./util');
 
 class Router {
     constructor() {
@@ -32,57 +35,22 @@ class Router {
         const parsedUrl = new URL(`http://${headers.host}${url}`);
         request.parsedUrl = parsedUrl;
 
-        if (method === 'POST') {
+        if (/.(css|js)$/.test(parsedUrl.pathname) && method === 'GET') {
+            await this.resolveStatic(request, response);
+        } else {
             try {
                 request.body = await this.getRequestBody(request);
+                await this.resolveRoute(request, response);
             } catch (error) {
-                console.error(123, error.message);
-                return response.sendJSON(400, {
+                console.error(error);
+
+                response.sendJSON(400, {
                     message: error.message,
                 });
             }
         }
-
-        let routesCollection;
-
-        if (method === 'POST') {
-            routesCollection = this.routes.post;
-        } else {
-            routesCollection = this.routes.get;
-        }
-
-        const routeHandlers = routesCollection[parsedUrl.pathname];
-
-        if (routeHandlers) {
-            // eslint-disable-next-line no-restricted-syntax
-            for (const handler of routeHandlers) {
-                try {
-                    // eslint-disable-next-line no-await-in-loop
-                    const breakRouteHandlersExecution = await handler(request, response);
-
-                    if (breakRouteHandlersExecution === true) {
-                        break;
-                    }
-                } catch (error) {
-                    console.error(error);
-                    response.sendJSON(500, {
-                        message: http.STATUS_CODES[500],
-                    });
-                }
-            }
-        } else if (method === 'GET') {
-            response.redirect('/404');
-        } else {
-            response.sendJSON(404, {
-                url: parsedUrl.pathname,
-                message: http.STATUS_CODES[404],
-            });
-        }
-
-        return true;
     }
 
-    // eslint-disable-next-line class-methods-use-this
     getRequestBody(request) {
         return new Promise((resolve, reject) => {
             let body = '';
@@ -107,6 +75,58 @@ class Router {
                 }
             });
         });
+    }
+
+    async resolveStatic(request, response) {
+        const { parsedUrl } = request;
+
+        console.log(parsedUrl.pathname);
+        const resourceContent = await readAsset(parsedUrl.pathname.slice(1));
+
+        if (parsedUrl.pathname.endsWith('.css')) {
+            response.setHeader('Content-Type', 'text/css');
+        }
+
+        if (parsedUrl.pathname.endsWith('.js')) {
+            response.setHeader('Content-Type', 'application/javascript');
+        }
+
+        response.write(resourceContent);
+        return response.end();
+    }
+
+    async resolveRoute(request, response) {
+        const { method, parsedUrl } = request;
+
+        const routesCollection = method === 'POST' ? this.routes.post : this.routes.get;
+        const routeHandlers = routesCollection[parsedUrl.pathname];
+
+        if (routeHandlers) {
+            // eslint-disable-next-line no-restricted-syntax
+            for (const handler of routeHandlers) {
+                try {
+                    // eslint-disable-next-line no-await-in-loop
+                    const breakRouteHandlersExecution = await handler(request, response);
+
+                    if (breakRouteHandlersExecution === true) {
+                        break;
+                    }
+                } catch (error) {
+                    console.error(error);
+
+                    response.sendJSON(500, {
+                        message: http.STATUS_CODES[500],
+                    });
+                }
+            }
+        } else if (method === 'GET') {
+            response.redirect('/404');
+        } else {
+            response.sendJSON(404, {
+                url: parsedUrl.pathname,
+                message: http.STATUS_CODES[404],
+            });
+        }
     }
 }
 
