@@ -1,5 +1,5 @@
 const { authGuard } = require('../guards');
-const { getConfig } = require('../config');
+const { getSettings } = require('../appSettings');
 const { getUsedMemory, getFreeMemory, getTotalMemory } = require('../util/memory');
 const { bytesToMb } = require('../util/spaceConverter');
 
@@ -13,7 +13,7 @@ module.exports = router => {
             });
         }
 
-        const { precision, memoryLimit } = getConfig();
+        const { precision, memoryLimit } = getSettings();
 
         const memoryData = {
             message: 'OK',

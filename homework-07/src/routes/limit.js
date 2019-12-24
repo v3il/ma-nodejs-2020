@@ -1,5 +1,5 @@
 const { authGuard } = require('../guards');
-const { updateConfig } = require('../config');
+const { updateSettings } = require('../appSettings');
 
 module.exports = router => {
     router.post('/limit', authGuard, (request, response) => {
@@ -11,7 +11,7 @@ module.exports = router => {
                 message: 'New value for minimum free memory limit is not valid number',
             });
         } else {
-            updateConfig({
+            updateSettings({
                 memoryLimit: numericLimit,
             });
 

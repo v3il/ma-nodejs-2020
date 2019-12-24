@@ -3,7 +3,7 @@ const http = require('http');
 
 const readAsset = require('./util/readAsset');
 
-class Router {
+module.exports = class Router {
     constructor() {
         this.routes = {
             get: {},
@@ -21,26 +21,19 @@ class Router {
 
     async resolve(request, response) {
         const { method, url, headers } = request;
-
-        response.sendJSON = function sendJSON(statusCode, data) {
-            this.writeHead(statusCode, { 'Content-Type': 'application/json' }).end(
-                JSON.stringify(data),
-            );
-        };
-
-        response.redirect = function redirect(to) {
-            this.writeHead(302, { Location: to }).end();
-        };
-
         const parsedUrl = new URL(`http://${headers.host}${url}`);
-        request.parsedUrl = parsedUrl;
 
-        if (/.(css|js|ico)$/.test(parsedUrl.pathname) && method === 'GET') {
-            await this.resolveStatic(request, response);
+        const modifiedRequest = {
+            parsedUrl,
+            ...request,
+        };
+
+        if (/\.(css|js|ico)$/.test(parsedUrl.pathname) && method === 'GET') {
+            await this.resolveStatic(modifiedRequest, response);
         } else {
             try {
-                request.body = await this.getRequestBody(request);
-                await this.resolveRoute(request, response);
+                modifiedRequest.body = await this.getRequestBody(request);
+                await this.resolveRoute(modifiedRequest, response);
             } catch (error) {
                 console.error(error);
 
@@ -136,6 +129,4 @@ class Router {
             });
         }
     }
-}
-
-module.exports = new Router();
+};
