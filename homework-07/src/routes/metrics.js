@@ -8,7 +8,7 @@ module.exports = router => {
         const filter = request.parsedUrl.searchParams.get('filter');
 
         if (filter && !['total', 'free', 'allocated'].includes(filter)) {
-            response.sendJSON(400, {
+            return response.sendJSON(400, {
                 message: 'Filter value is not valid',
             });
         }
