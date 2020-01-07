@@ -1,8 +1,8 @@
 const { getSettings } = require('../appSettings');
 
-module.exports = (request, response) => {
+module.exports = ({ headers }, response) => {
     const { authToken } = getSettings();
-    const { authorization: authHeader } = request.headers;
+    const { authorization: authHeader } = headers;
 
     const isValidHeader = authHeader && authHeader === `Basic ${authToken}`;
 
@@ -13,6 +13,4 @@ module.exports = (request, response) => {
 
         return true;
     }
-
-    return false;
 };

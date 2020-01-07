@@ -1,15 +1,9 @@
-const readAsset = require('../util/readAsset');
-
 module.exports = router => {
     router.get('/', async (request, response) => {
         try {
-            const content = await readAsset('index.html');
-
-            response.setHeader('Content-Type', 'text/html');
-            response.write(content);
-            response.end();
+            await response.renderPage('index.html');
         } catch (error) {
-            console.error('index.html does not exist');
+            console.error('index.html does not exist', error);
             response.redirect('/404');
         }
     });
