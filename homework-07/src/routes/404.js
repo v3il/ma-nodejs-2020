@@ -3,7 +3,7 @@ const http = require('http');
 module.exports = router => {
     router.get('/404', async (request, response) => {
         try {
-            await response.renderPage('404.html');
+            await response.renderView('404.html');
         } catch (error) {
             console.error('404.html does not exist');
 

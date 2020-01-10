@@ -7,6 +7,9 @@ const setupRoutes = require('./routes');
 
 const router = new Router();
 
+router.setStaticDir('assets');
+router.setViewsDir('src/views');
+
 setupRoutes(router);
 
 http.createServer(async (request, response) => {

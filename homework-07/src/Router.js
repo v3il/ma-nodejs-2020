@@ -9,6 +9,9 @@ module.exports = class Router {
             get: {},
             post: {},
         };
+
+        this.viewsDir = null;
+        this.staticDir = null;
     }
 
     get(url, ...handlers) {
@@ -19,21 +22,31 @@ module.exports = class Router {
         this.routes.post[url] = handlers;
     }
 
+    setViewsDir(viewsDir) {
+        this.viewsDir = viewsDir;
+    }
+
+    setStaticDir(staticDir) {
+        this.staticDir = staticDir;
+    }
+
     async resolve(request, response) {
         const { method, url, headers } = request;
         const parsedUrl = new URL(`http://${headers.host}${url}`);
 
-        const modifiedRequest = {
-            parsedUrl,
-            ...request,
-        };
+        request.parsedUrl = parsedUrl;
 
-        if (/\.(css|js|ico)$/.test(parsedUrl.pathname) && method === 'GET') {
-            await this.resolveStatic(modifiedRequest, response);
+        response.viewsDir = this.viewsDir;
+        response.staticDir = this.staticDir;
+
+        const staticDirRegexp = new RegExp(`/${this.staticDir}/`, 'g');
+
+        if (method === 'GET' && this.staticDir && staticDirRegexp.test(parsedUrl.pathname)) {
+            await this.resolveStatic(request, response);
         } else {
             try {
-                modifiedRequest.body = await this.getRequestBody(request);
-                await this.resolveRoute(modifiedRequest, response);
+                request.body = await this.getRequestBody(request);
+                await this.resolveRoute(request, response);
             } catch (error) {
                 console.error(error);
 
@@ -74,25 +87,24 @@ module.exports = class Router {
         const { parsedUrl } = request;
 
         try {
-            const resourceContent = await readAsset(parsedUrl.pathname.slice(1));
+            const resourceContent = await readAsset(parsedUrl.pathname);
+            const staticFileExt = parsedUrl.pathname.split('.').pop();
 
-            if (parsedUrl.pathname.endsWith('.css')) {
-                response.setHeader('Content-Type', 'text/css');
-            }
-
-            if (parsedUrl.pathname.endsWith('.js')) {
-                response.setHeader('Content-Type', 'application/javascript');
-            }
-
-            response.write(resourceContent);
-            response.end();
+            response.setHeader('Content-Type', this.getContentTypeForExt(staticFileExt));
+            response.writeHead(200).end(resourceContent);
         } catch (error) {
             console.error(error);
-
-            response.sendJSON(404, {
-                message: http.STATUS_CODES[404],
-            });
+            response.writeHead(404).end();
         }
+    }
+
+    getContentTypeForExt(ext) {
+        const contentTypesMap = {
+            css: 'text/css',
+            js: 'application/javascript',
+        };
+
+        return contentTypesMap[ext] || 'text/plain';
     }
 
     async resolveRoute(request, response) {
