@@ -1,19 +1,51 @@
-// const asyncRequest = require('../util/asyncRequest');
+const http = require('http');
 
-// const authToken = Buffer.from('Dmitry | My secret password').toString('base64');
+const BaseManager = require('./base');
 
-// const options = {
-//     hostname: '194.32.79.212',
-//     port: 3060,
-//     path: '/metrics',
-//     method: 'GET',
-//     headers: {
-//         authorization: `Basic ${authToken}`,
-//     },
-// };
+class NodeManager extends BaseManager {
+    async fetchData() {
+        const options = {
+            hostname: '194.32.79.212',
+            port: 3060,
+            path: '/metrics',
+            method: 'GET',
+            headers: {
+                authorization: `Basic ${this.getAuthToken()}`,
+            },
+        };
 
-// asyncRequest(options).then(console.log);
+        return this.asyncRequest(options);
+    }
 
-class NodeManager {}
+    asyncRequest(options) {
+        return new Promise((resolve, reject) => {
+            const request = http.request(options, response => {
+                response.setEncoding('utf8');
+
+                let rawData = '';
+
+                response.on('data', chunk => {
+                    rawData += chunk;
+                });
+
+                response.on('end', () => {
+                    try {
+                        response.data = JSON.parse(rawData);
+                    } catch (error) {
+                        response.data = {};
+                    }
+
+                    resolve(response);
+                });
+            });
+
+            request.on('error', error => {
+                reject(error);
+            });
+
+            request.end();
+        });
+    }
+}
 
 module.exports = new NodeManager();

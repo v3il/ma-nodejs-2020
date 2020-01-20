@@ -25,5 +25,10 @@
         "hooks": {
             "pre-commit": "npm run lint:fix && npm run test && cd .. && git add ."
         }
+    },
+    "dependencies": {
+        "axios": "^0.19.1",
+        "request": "^2.88.0",
+        "request-promise-native": "^1.0.8"
     }
 }
