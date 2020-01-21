@@ -1,4 +1,4 @@
-const authToken = Buffer.from('Dmitry | My secret password').toString('base64');
+const authToken = Buffer.from('Dmitry:Password').toString('base64');
 
 let appSettings = {
     authToken,

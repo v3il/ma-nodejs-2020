@@ -7,7 +7,7 @@
     const logElement = document.getElementById('log');
     const sendBadApiRequestBtn = document.getElementById('bad-api');
 
-    const credentials = btoa('Dmitry | My secret password');
+    const credentials = btoa('Dmitry:Password');
 
     async function processResponse(response) {
         const json = await response.json();

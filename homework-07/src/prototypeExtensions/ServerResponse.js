@@ -2,8 +2,10 @@ const http = require('http');
 
 const readAsset = require('../util/readAsset');
 
-http.ServerResponse.prototype.sendJSON = function sendJSON(statusCode, data) {
-    this.writeHead(statusCode, { 'Content-Type': 'application/json' }).end(JSON.stringify(data));
+http.ServerResponse.prototype.sendJSON = function sendJSON(statusCode, data, headers = {}) {
+    this.writeHead(statusCode, { 'Content-Type': 'application/json', ...headers }).end(
+        JSON.stringify(data),
+    );
 };
 
 http.ServerResponse.prototype.redirect = function redirect(to) {

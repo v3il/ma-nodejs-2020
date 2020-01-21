@@ -7,10 +7,7 @@ module.exports = ({ headers }, response) => {
     const isValidHeader = authHeader && authHeader === `Basic ${authToken}`;
 
     if (!isValidHeader) {
-        response.sendJSON(401, {
-            message: 'Unauthorized',
-        });
-
+        response.sendJSON(401, { message: 'Unauthorized' }, { 'WWW-Authenticate': 'Basic' });
         return true;
     }
 };
