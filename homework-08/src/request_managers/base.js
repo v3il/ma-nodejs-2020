@@ -1,27 +1,15 @@
+const util = require('util');
+
+const promisifiedSetTimeout = util.promisify(setTimeout);
+
 module.exports = class BaseManager {
     constructor() {
         this.pendingRequests = 0;
-        this.maxRetries = 10;
-
-        this.resetRetryParams();
+        this.maxRetries = 30;
     }
 
     hasPendingRequests() {
         return this.pendingRequests > 0;
-    }
-
-    resetRetryParams() {
-        this.retryIndex = 0;
-        this.retryDelay = 100;
-    }
-
-    setParamsForNextRetry() {
-        this.retryIndex++;
-        this.retryDelay += 200;
-    }
-
-    shouldRetry() {
-        return this.retryIndex < this.maxRetries;
     }
 
     async get() {
@@ -32,51 +20,45 @@ module.exports = class BaseManager {
         return { data: 'fetch method is not implemented' };
     }
 
-    async asyncRequest(options, isRetry = false) {
-        return new Promise(resolve => {
-            (async () => {
-                if (!isRetry) {
-                    this.pendingRequests++;
-                }
+    async asyncRequest(
+        requestOptions,
+        retryOptions = { isRetry: false, retryIndex: 0, retryDelay: 100 },
+    ) {
+        const { isRetry, retryIndex, retryDelay } = retryOptions;
 
-                try {
-                    const response = await this.fetch(options);
+        if (!isRetry) {
+            this.pendingRequests++;
+        }
 
-                    // console.log(response)
+        try {
+            // Successful request
+            const response = await this.fetch(requestOptions);
 
-                    if (response.statusCode >= 200 && response.statusCode < 300) {
-                        this.pendingRequests--;
+            response.retryIndex = retryIndex;
+            response.pendingRequests = --this.pendingRequests;
 
-                        response.retryIndex = this.retryIndex;
-                        response.pendingRequests = this.pendingRequests;
-                        resolve(response);
+            return response;
+        } catch (error) {
+            // Failed request
+            if (retryIndex < this.maxRetries) {
+                await promisifiedSetTimeout(retryDelay);
 
-                        this.resetRetryParams();
-                    }
-                } catch (error) {
-                    // console.log(error.message)
+                // Retry failed request
+                return this.asyncRequest(requestOptions, {
+                    isRetry: true,
+                    retryIndex: retryIndex + 1,
+                    retryDelay: retryDelay + 150,
+                });
+            }
 
-                    if (this.shouldRetry()) {
-                        this.setParamsForNextRetry();
+            this.pendingRequests--;
 
-                        setTimeout(async () => {
-                            resolve(await this.asyncRequest(options, true));
-                        }, this.retryDelay);
-                    } else {
-                        this.pendingRequests--;
-
-                        resolve({
-                            data:
-                                '\x1b[31mNo connection with server, waiting for next iteration...\x1b[37m',
-                            retryIndex: this.retryIndex,
-                            pendingRequests: this.pendingRequests,
-                        });
-
-                        this.resetRetryParams();
-                    }
-                }
-            })();
-        });
+            return {
+                data: '\x1b[31mNo connection with server, waiting for next iteration...\x1b[37m',
+                retryIndex: this.maxRetries,
+                pendingRequests: this.pendingRequests,
+            };
+        }
     }
 
     getAuthToken() {

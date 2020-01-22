@@ -4,7 +4,7 @@ async function fetchHandler(fetchManager) {
     console.clear();
 
     ['/metrics', '/limit'].forEach(async url => {
-        console.log(`Fetching data from ${url}...`);
+        console.log(`(${fetchManager.constructor.name}) Fetching data from ${url}...`);
 
         try {
             const { data, retryIndex, pendingRequests } = await fetchManager.get(url);
@@ -28,14 +28,14 @@ function getCurrentManager(managerIndex) {
     return mapping[managerIndex] || nodeManager;
 }
 
-async function startDataFetching(fetchManager) {
+function startDataFetching(fetchManager) {
     setInterval(async () => {
         if (fetchManager.hasPendingRequests()) {
             console.log('\n\x1b[32mManager is busy, skip this iteration... \x1b[37m');
         } else {
             fetchHandler(fetchManager);
         }
-    }, 10 * 1000);
+    }, 12 * 1000);
 
     fetchHandler(fetchManager);
 }
@@ -51,8 +51,8 @@ function prompt() {
         .resume()
         .setEncoding('utf8')
         .once('data', key => {
-            const currentManager = getCurrentManager(parseInt(key, 10));
-            startDataFetching(currentManager);
+            const fetchManager = getCurrentManager(parseInt(key, 10));
+            startDataFetching(fetchManager);
         });
 }
 

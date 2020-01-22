@@ -1,4 +1,4 @@
-const rp = require('request-promise-native');
+const requestPromise = require('request-promise-native');
 
 const BaseManager = require('./base');
 
@@ -17,7 +17,7 @@ class RequestNativeManager extends BaseManager {
     }
 
     async fetch(options) {
-        const response = await rp(options);
+        const response = await requestPromise(options);
         response.data = response.body;
         return response;
     }

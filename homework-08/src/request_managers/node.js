@@ -44,58 +44,6 @@ class NodeManager extends BaseManager {
         });
     }
 
-    // async asyncRequest(options, isRetry = false) {
-    //     return new Promise((resolve, reject) => {
-    //         if (!isRetry) {
-    //             this.pendingRequests++;
-    //         }
-    //
-    //         const request = http.request(options, async response => {
-    //             response.setEncoding('utf8');
-    //
-    //             try {
-    //                 const responseData = await this.getResponseData(response);
-    //                 response.data = JSON.parse(responseData);
-    //             } catch (error) {
-    //                 response.data = {};
-    //             }
-    //
-    //             if (response.statusCode === 200) {
-    //                 this.pendingRequests--;
-    //
-    //                 response.retryIndex = this.retryIndex;
-    //                 response.pendingRequests = this.pendingRequests;
-    //                 resolve(response);
-    //
-    //                 this.resetRetryParams();
-    //             } else if (this.shouldRetry()) {
-    //                 this.setParamsForNextRetry();
-    //
-    //                 setTimeout(async () => {
-    //                     resolve(await this.asyncRequest(options, true));
-    //                 }, this.retryDelay);
-    //             } else {
-    //                 this.pendingRequests--;
-    //
-    //                 resolve({
-    //                     data:
-    //                         '\x1b[31mNo connection with server, waiting for next iteration...\x1b[37m',
-    //                     retryIndex: this.retryIndex,
-    //                     pendingRequests: this.pendingRequests,
-    //                 });
-    //
-    //                 this.resetRetryParams();
-    //             }
-    //         });
-    //
-    //         request.on('error', error => {
-    //             reject(error);
-    //         });
-    //
-    //         request.end();
-    //     });
-    // }
-
     getResponseData(rawResponse) {
         return new Promise(resolve => {
             let rawData = '';
