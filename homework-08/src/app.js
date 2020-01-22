@@ -3,21 +3,19 @@ const { axiosManager, nodeManager, requestManager } = require('./request_manager
 async function fetchHandler(fetchManager) {
     console.clear();
 
-    // eslint-disable-next-line no-restricted-syntax
-    for (const url of ['/metrics', '/limit']) {
+    ['/metrics', '/limit'].forEach(async url => {
         console.log(`Fetching data from ${url}...`);
 
         try {
-            // eslint-disable-next-line no-await-in-loop
-            const response = await fetchManager.fetchData(url);
+            const { data, retryIndex, pendingRequests } = await fetchManager.get(url);
 
-            console.log(`Received data (${url}), retry number: ${response.retryIndex}:`);
-            console.log(response.data);
-            console.log('\n');
+            console.log(`\nReceived data (${url}), retry number: ${retryIndex}:`);
+            console.log(data);
+            console.log(`Pending requests: ${pendingRequests}`);
         } catch (error) {
             console.error(error);
         }
-    }
+    });
 }
 
 function getCurrentManager(managerIndex) {
@@ -32,8 +30,8 @@ function getCurrentManager(managerIndex) {
 
 async function startDataFetching(fetchManager) {
     setInterval(async () => {
-        if (fetchManager.isBusy()) {
-            console.log('\x1b[31mManager is busy, skip this iteration...\x1b[37m');
+        if (fetchManager.hasPendingRequests()) {
+            console.log('\n\x1b[32mManager is busy, skip this iteration... \x1b[37m');
         } else {
             fetchHandler(fetchManager);
         }

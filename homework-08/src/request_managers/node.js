@@ -3,7 +3,7 @@ const http = require('http');
 const BaseManager = require('./base');
 
 class NodeManager extends BaseManager {
-    async fetchData(path) {
+    async get(path) {
         const options = {
             path,
             hostname: '194.32.79.212',
@@ -17,10 +17,8 @@ class NodeManager extends BaseManager {
         return this.asyncRequest(options);
     }
 
-    async asyncRequest(options) {
+    fetch(options) {
         return new Promise((resolve, reject) => {
-            this.busy = true;
-
             const request = http.request(options, async response => {
                 response.setEncoding('utf8');
 
@@ -32,25 +30,9 @@ class NodeManager extends BaseManager {
                 }
 
                 if (response.statusCode === 200) {
-                    response.retryIndex = this.retryIndex;
                     resolve(response);
-
-                    this.busy = false;
-                    this.resetRetryParams();
-                } else if (this.shouldRetry()) {
-                    this.setParamsForNextRetry();
-
-                    setTimeout(async () => {
-                        resolve(await this.asyncRequest(options));
-                    }, this.retryDelay);
                 } else {
-                    resolve({
-                        data: 'No connection with server, waiting for next iteration...',
-                        retryIndex: this.retryIndex,
-                    });
-
-                    this.busy = false;
-                    this.resetRetryParams();
+                    reject(new Error(`Server responded with status ${response.statusCode}`));
                 }
             });
 
@@ -61,6 +43,58 @@ class NodeManager extends BaseManager {
             request.end();
         });
     }
+
+    // async asyncRequest(options, isRetry = false) {
+    //     return new Promise((resolve, reject) => {
+    //         if (!isRetry) {
+    //             this.pendingRequests++;
+    //         }
+    //
+    //         const request = http.request(options, async response => {
+    //             response.setEncoding('utf8');
+    //
+    //             try {
+    //                 const responseData = await this.getResponseData(response);
+    //                 response.data = JSON.parse(responseData);
+    //             } catch (error) {
+    //                 response.data = {};
+    //             }
+    //
+    //             if (response.statusCode === 200) {
+    //                 this.pendingRequests--;
+    //
+    //                 response.retryIndex = this.retryIndex;
+    //                 response.pendingRequests = this.pendingRequests;
+    //                 resolve(response);
+    //
+    //                 this.resetRetryParams();
+    //             } else if (this.shouldRetry()) {
+    //                 this.setParamsForNextRetry();
+    //
+    //                 setTimeout(async () => {
+    //                     resolve(await this.asyncRequest(options, true));
+    //                 }, this.retryDelay);
+    //             } else {
+    //                 this.pendingRequests--;
+    //
+    //                 resolve({
+    //                     data:
+    //                         '\x1b[31mNo connection with server, waiting for next iteration...\x1b[37m',
+    //                     retryIndex: this.retryIndex,
+    //                     pendingRequests: this.pendingRequests,
+    //                 });
+    //
+    //                 this.resetRetryParams();
+    //             }
+    //         });
+    //
+    //         request.on('error', error => {
+    //             reject(error);
+    //         });
+    //
+    //         request.end();
+    //     });
+    // }
 
     getResponseData(rawResponse) {
         return new Promise(resolve => {
