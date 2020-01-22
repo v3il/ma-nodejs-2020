@@ -1,48 +1,22 @@
-const util = require('util');
-
 const { axiosManager, nodeManager, requestManager } = require('./request_managers');
-
-const promisifiedSetTimeout = util.promisify(setTimeout);
-
-let retryDelay = 100;
-let retryIndex = 0;
-let isRetrying = false;
-
-const maxRetries = 50;
 
 async function fetchHandler(fetchManager) {
     console.clear();
-    console.log(
-        `(${fetchManager.constructor.name})`,
-        'Fetching data...',
-        retryIndex > 0 ? `Retry ${retryIndex} / ${maxRetries}` : '',
-    );
 
-    await promisifiedSetTimeout(retryDelay);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const url of ['/metrics', '/limit']) {
+        console.log(`Fetching data from ${url}...`);
 
-    try {
-        const data = await fetchManager.loadData();
+        try {
+            // eslint-disable-next-line no-await-in-loop
+            const response = await fetchManager.fetchData(url);
 
-        if (data.statusCode === 200) {
-            isRetrying = false;
-            retryIndex = 0;
-            retryDelay = 100;
-
-            console.clear();
-            console.log(data.data);
-        } else {
-            retryIndex++;
-            isRetrying = true;
-            retryDelay += 100;
-
-            if (retryIndex > maxRetries) {
-                console.log('No connection to server, stopping the application');
-            } else {
-                fetchHandler(fetchManager);
-            }
+            console.log(`Received data (${url}), retry number: ${response.retryIndex}:`);
+            console.log(response.data);
+            console.log('\n');
+        } catch (error) {
+            console.error(error);
         }
-    } catch (error) {
-        console.error(error);
     }
 }
 
@@ -56,13 +30,14 @@ function getCurrentManager(managerIndex) {
     return mapping[managerIndex] || nodeManager;
 }
 
-function startDataFetching(fetchManager) {
-    setInterval(() => {
-        if (!isRetrying) {
-            console.clear();
+async function startDataFetching(fetchManager) {
+    setInterval(async () => {
+        if (fetchManager.isBusy()) {
+            console.log('\x1b[31mManager is busy, skip this iteration...\x1b[37m');
+        } else {
             fetchHandler(fetchManager);
         }
-    }, 5 * 1000);
+    }, 10 * 1000);
 
     fetchHandler(fetchManager);
 }
