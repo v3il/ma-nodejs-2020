@@ -42,7 +42,7 @@ class NodeManager extends BaseManager {
                     response.data = {};
                 }
 
-                if (response.statusCode === 200) {
+                if (response.statusCode >= 200 && response.statusCode < 300) {
                     resolve(response);
                 } else {
                     reject(new Error(`Server responded with status ${response.statusCode}`));
