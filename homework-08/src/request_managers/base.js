@@ -12,14 +12,6 @@ module.exports = class BaseManager {
         return this.pendingRequests > 0;
     }
 
-    async get() {
-        return { data: 'get method is not implemented' };
-    }
-
-    async fetch() {
-        return { data: 'fetch method is not implemented' };
-    }
-
     async asyncRequest(
         requestOptions,
         retryOptions = { isRetry: false, retryIndex: 0, retryDelay: 100 },
@@ -36,6 +28,8 @@ module.exports = class BaseManager {
 
             response.retryIndex = retryIndex;
             response.pendingRequests = --this.pendingRequests;
+            response.url = new URL(requestOptions.url);
+            response.method = requestOptions.method;
 
             return response;
         } catch (error) {
@@ -59,9 +53,5 @@ module.exports = class BaseManager {
                 pendingRequests: this.pendingRequests,
             };
         }
-    }
-
-    getAuthToken() {
-        return Buffer.from('Dmitry:Password').toString('base64');
     }
 };

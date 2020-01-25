@@ -1,21 +1,51 @@
 const { axiosManager, nodeManager, requestManager } = require('./request_managers');
 
+const authToken = `Basic ${Buffer.from('Dmitry:Password').toString('base64')}`;
+
+async function getMetrics(fetchManager) {
+    return fetchManager.get('http://194.32.79.212:3000/metrics', {
+        headers: {
+            authorization: authToken,
+        },
+    });
+}
+
+async function getLimit(fetchManager) {
+    return fetchManager.get('http://194.32.79.212:3000/limit');
+}
+
+async function changeLimit(fetchManager) {
+    return fetchManager.post(
+        'http://194.32.79.212:3000/limit',
+        { limit: Math.ceil(Math.random() * 1000) + 10 },
+        {
+            headers: {
+                authorization: authToken,
+            },
+        },
+    );
+}
+
 async function fetchHandler(fetchManager) {
     console.clear();
 
-    ['/metrics', '/limit'].forEach(async url => {
-        console.log(`(${fetchManager.constructor.name}) Fetching data from ${url}...`);
+    console.log(`(${fetchManager.constructor.name}) Sending requests...`);
 
-        try {
-            const { data, retryIndex, pendingRequests } = await fetchManager.get(url);
+    [changeLimit(fetchManager), getMetrics(fetchManager), getLimit(fetchManager)].forEach(
+        async request => {
+            try {
+                const { data, retryIndex, pendingRequests, url, method } = await request;
 
-            console.log(`\nReceived data (${url}), retry number: ${retryIndex}:`);
-            console.log(data);
-            console.log(`Pending requests: ${pendingRequests}`);
-        } catch (error) {
-            console.error(error);
-        }
-    });
+                console.log(
+                    `\nReceived data (${method.toUpperCase()}: ${url}), retry number: ${retryIndex}:`,
+                );
+                console.log(data);
+                console.log(`Pending requests: ${pendingRequests}`);
+            } catch (error) {
+                console.error(error);
+            }
+        },
+    );
 }
 
 function getCurrentManager(managerIndex) {

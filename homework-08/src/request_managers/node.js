@@ -3,18 +3,31 @@ const http = require('http');
 const BaseManager = require('./base');
 
 class NodeManager extends BaseManager {
-    async get(path) {
-        const options = {
-            path,
-            hostname: '194.32.79.212',
-            port: 3000,
-            method: 'GET',
-            headers: {
-                authorization: `Basic ${this.getAuthToken()}`,
-            },
-        };
+    async get(url, config = {}) {
+        const parsedURL = new URL(url);
 
-        return this.asyncRequest(options);
+        return this.asyncRequest({
+            url,
+            path: parsedURL.pathname,
+            hostname: parsedURL.hostname,
+            port: parsedURL.port,
+            method: 'GET',
+            ...config,
+        });
+    }
+
+    async post(url, body = {}, config = {}) {
+        const parsedURL = new URL(url);
+
+        return this.asyncRequest({
+            url,
+            path: parsedURL.pathname,
+            hostname: parsedURL.hostname,
+            port: parsedURL.port,
+            method: 'POST',
+            data: body,
+            ...config,
+        });
     }
 
     fetch(options) {
@@ -39,6 +52,10 @@ class NodeManager extends BaseManager {
             request.on('error', error => {
                 reject(error);
             });
+
+            if (options.method === 'POST') {
+                request.write(JSON.stringify(options.data || {}));
+            }
 
             request.end();
         });

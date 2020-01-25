@@ -3,17 +3,27 @@ const requestPromise = require('request-promise-native');
 const BaseManager = require('./base');
 
 class RequestNativeManager extends BaseManager {
-    async get(path) {
-        const options = {
-            uri: `http://194.32.79.212:3000${path}`,
+    async get(url, config = {}) {
+        return this.asyncRequest({
+            url,
+            uri: url,
+            method: 'get',
             json: true,
             resolveWithFullResponse: true,
-            headers: {
-                authorization: `Basic ${this.getAuthToken()}`,
-            },
-        };
+            ...config,
+        });
+    }
 
-        return this.asyncRequest(options);
+    async post(url, body = {}, config = {}) {
+        return this.asyncRequest({
+            url,
+            body,
+            uri: url,
+            method: 'post',
+            json: true,
+            resolveWithFullResponse: true,
+            ...config,
+        });
     }
 
     async fetch(options) {
