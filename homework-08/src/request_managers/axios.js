@@ -3,14 +3,18 @@ const axios = require('axios');
 const BaseManager = require('./base');
 
 class AxiosManager extends BaseManager {
-    async get(path) {
+    async get(url) {
         return this.asyncRequest({
             method: 'get',
-            url: `http://194.32.79.212:3000${path}`,
+            url: `http://194.32.79.212:3000${url}`,
             headers: {
                 authorization: `Basic ${this.getAuthToken()}`,
             },
         });
+    }
+
+    async post(url, body) {
+        console.log(url, body)
     }
 
     async fetch(options) {
