@@ -1,32 +1,26 @@
 const { axiosManager, nodeManager, requestManager } = require('./request_managers');
 
-const authToken = `Basic ${Buffer.from('Dmitry:Password').toString('base64')}`;
+const headers = {
+    authorization: `Basic ${Buffer.from('Dmitry:Password').toString('base64')}`,
+};
 
-async function getMetrics(fetchManager) {
-    return fetchManager.get('http://194.32.79.212:3000/metrics', {
-        headers: {
-            authorization: authToken,
-        },
-    });
+function getMetrics(fetchManager) {
+    return fetchManager.get('http://194.32.79.212:3000/metrics', { headers });
 }
 
-async function getLimit(fetchManager) {
+function getLimit(fetchManager) {
     return fetchManager.get('http://194.32.79.212:3000/limit');
 }
 
-async function changeLimit(fetchManager) {
+function changeLimit(fetchManager) {
     return fetchManager.post(
         'http://194.32.79.212:3000/limit',
         { limit: Math.ceil(Math.random() * 1000) + 10 },
-        {
-            headers: {
-                authorization: authToken,
-            },
-        },
+        { headers },
     );
 }
 
-async function fetchHandler(fetchManager) {
+function fetchHandler(fetchManager) {
     console.clear();
 
     console.log(`(${fetchManager.constructor.name}) Sending requests...`);
@@ -36,9 +30,7 @@ async function fetchHandler(fetchManager) {
             try {
                 const { data, retryIndex, pendingRequests, url, method } = await request;
 
-                console.log(
-                    `\nReceived data (${method.toUpperCase()}: ${url}), retry number: ${retryIndex}:`,
-                );
+                console.log(`\nReceived data (${method}: ${url}), retry number: ${retryIndex}:`);
                 console.log(data);
                 console.log(`Pending requests: ${pendingRequests}`);
             } catch (error) {
@@ -59,7 +51,7 @@ function getCurrentManager(managerIndex) {
 }
 
 function startDataFetching(fetchManager) {
-    setInterval(async () => {
+    setInterval(() => {
         if (fetchManager.hasPendingRequests()) {
             console.log('\n\x1b[32mManager is busy, skip this iteration... \x1b[37m');
         } else {

@@ -29,7 +29,7 @@ module.exports = class BaseManager {
             response.retryIndex = retryIndex;
             response.pendingRequests = --this.pendingRequests;
             response.url = new URL(requestOptions.url);
-            response.method = requestOptions.method;
+            response.method = requestOptions.method.toUpperCase();
 
             return response;
         } catch (error) {
