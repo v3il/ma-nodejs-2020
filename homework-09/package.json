@@ -1,0 +1,34 @@
+{
+    "name": "homework-09",
+    "main": "src/app.js",
+    "scripts": {
+        "dev": "nodemon src/app.js",
+        "start": "node src/app.js",
+        "lint": "npx eslint --ignore-path .gitignore .",
+        "lint:fix": "npx eslint --ignore-path .gitignore . --fix",
+        "test:dev": "jest --no-cache --watch --passWithNoTests",
+        "test": "jest --no-cache --silent --passWithNoTests"
+    },
+    "author": "Dmitry Kit",
+    "devDependencies": {
+        "eslint": "^6.6.0",
+        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-config-prettier": "^6.5.0",
+        "eslint-plugin-import": "^2.18.2",
+        "eslint-plugin-prettier": "^3.1.1",
+        "husky": "^3.0.9",
+        "jest": "^24.9.0",
+        "nodemon": "^2.0.2",
+        "prettier": "^1.19.1"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm run lint:fix && npm run test && cd .. && git add ."
+        }
+    },
+    "dependencies": {
+        "axios": "^0.19.1",
+        "request": "^2.88.0",
+        "request-promise-native": "^1.0.8"
+    }
+}
