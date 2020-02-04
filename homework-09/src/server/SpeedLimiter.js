@@ -4,17 +4,23 @@ const { performance } = require('perf_hooks');
 const ITERATION_DURATION = 1000;
 
 module.exports = class SpeedLimiter extends Transform {
-    constructor(limit) {
+    constructor({ dataVolumeToNotify, limit }) {
         super();
 
         this.limit = limit;
+        this.dataVolumeToNotify = dataVolumeToNotify;
+
         this.transferedDataSize = 0;
         this.unsentData = null;
         this.iterationStart = performance.now();
         this.isNewIteration = false;
+        this.transferedDataSizeAccumulator = 0;
 
         this.on('end', () => {
-            this.emitMbTransferredEvent();
+            // Something was transferred during the very last iteration
+            if (this.transferedDataSize > 0) {
+                this.emitMbTransferredEvent();
+            }
         });
     }
 
@@ -24,6 +30,10 @@ module.exports = class SpeedLimiter extends Transform {
             if (this.unsentData) {
                 this.push(this.unsentData);
                 this.transferedDataSize += this.unsentData.length;
+
+                this.transferedDataSizeAccumulator += this.unsentData.length;
+                this.checkAccumulatedDataVolume();
+
                 this.unsentData = null;
             }
 
@@ -42,8 +52,6 @@ module.exports = class SpeedLimiter extends Transform {
                 setTimeout(() => {
                     this.isNewIteration = true;
 
-                    this.emitMbTransferredEvent();
-
                     this.iterationStart = performance.now();
                     this.transferedDataSize = 0;
 
@@ -54,7 +62,18 @@ module.exports = class SpeedLimiter extends Transform {
             }
         } else {
             this.transferedDataSize += chunk.length;
+
+            this.transferedDataSizeAccumulator += chunk.length;
+            this.checkAccumulatedDataVolume();
+
             done(null, chunk);
+        }
+    }
+
+    checkAccumulatedDataVolume() {
+        if (this.transferedDataSizeAccumulator >= this.dataVolumeToNotify) {
+            this.emitMbTransferredEvent();
+            this.transferedDataSizeAccumulator = 0;
         }
     }
 
