@@ -3,7 +3,7 @@ const { performance } = require('perf_hooks');
 
 const ITERATION_DURATION = 1000;
 
-module.exports = class Transformer extends Transform {
+module.exports = class SpeedLimiter extends Transform {
     constructor(limit) {
         super();
 
