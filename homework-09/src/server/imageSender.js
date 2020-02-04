@@ -5,39 +5,25 @@ const config = require('../config');
 const Transformer = require('./Transformer');
 
 function sendJPEG(response) {
-    const readStream = fs.createReadStream(config.filePath);
-    const transformer = new Transformer();
+    const { filePath, limit, minLimit } = config;
+
+    const readStream = fs.createReadStream(filePath);
+    const transformer = new Transformer(Math.max(limit, minLimit));
+
+    transformer.on('megabyte-transferred', () => {
+        process.stdout.write('.');
+    });
+
+    console.log('Download started');
 
     pipeline(readStream, transformer, response, error => {
         if (error) {
             console.error('Failed to send image buffer!', error.stack);
-            return response.emit('error', new Error('Failed to send image!'));
+            response.emit('error', new Error('Failed to send image!'));
+        } else {
+            console.log('\nDownload finished');
         }
-
-        return console.log('Ok');
     });
-
-    // readStream.on('error', error => {
-    //     console.error('Failed to send image buffer!', error.stack);
-    //     res.emit('error', new Error('Failed to send image!'));
-    // });
-    //
-    // readStream.pipe(res);
-    //
-    // readStream.on('data', () => {
-    //     // console.log('Data');
-    // });
-    //
-    // res.on('drain', () => {
-    //     process.stdout.write('*');
-    // });
-
-    // fsp.readFile(config.filePath)
-    //     .then(buffer => res.end(buffer))
-    //     .catch(err => {
-    //         console.error('Failed to send image buffer!', err.stack);
-    //         res.emit('error', new Error('Failed to send image!'));
-    //     });
 }
 
 module.exports = {

@@ -1,47 +1,64 @@
 const { Transform } = require('stream');
+const { performance } = require('perf_hooks');
+
+const ITERATION_DURATION = 1000;
 
 module.exports = class Transformer extends Transform {
-    constructor(limit = 1000) {
+    constructor(limit) {
         super();
+
         this.limit = limit;
-        this.i = 0;
-
-        this.transferedData = 0;
+        this.transferedDataSize = 0;
         this.unsentData = null;
-
-        const id = setInterval(() => {
-            this.transferedData = 0;
-            if (this.isPaused()) this.resume();
-        }, 1000);
+        this.iterationStart = performance.now();
+        this.isNewIteration = false;
 
         this.on('end', () => {
-            clearInterval(id);
-            console.log(this.i);
+            this.emitMbTransferredEvent();
         });
-
-        console.log(limit);
     }
 
-    // eslint-disable-next-line class-methods-use-this,no-underscore-dangle
+    // eslint-disable-next-line no-underscore-dangle
     _transform(chunk, encoding, done) {
-        const maxBytes = 1024 * 1024;
+        if (this.isNewIteration) {
+            if (this.unsentData) {
+                this.push(this.unsentData);
+                this.transferedDataSize += this.unsentData.length;
+                this.unsentData = null;
+            }
 
-        if (this.isPaused()) {
-            console.log('Paused');
+            this.isNewIteration = false;
         }
 
-        // eslint-disable-next-line no-plusplus
-        this.i++;
+        // Can't send more data in this iteration (limit reached)
+        if (this.transferedDataSize + chunk.length > this.limit) {
+            // We'll send this data at the beginning of next iteration
+            this.unsentData = chunk;
 
-        // console.log(this.transferedData)
+            const remainingTime = this.iterationStart + ITERATION_DURATION - performance.now();
 
-        this.transferedData += chunk.length;
+            // Pause stream execution for remaining time
+            if (remainingTime > 0) {
+                setTimeout(() => {
+                    this.isNewIteration = true;
 
-        if (this.transferedData > maxBytes) {
-            console.log('Pause');
-            this.pause();
+                    this.emitMbTransferredEvent();
+
+                    this.iterationStart = performance.now();
+                    this.transferedDataSize = 0;
+
+                    done();
+                }, remainingTime);
+            } else {
+                done();
+            }
+        } else {
+            this.transferedDataSize += chunk.length;
+            done(null, chunk);
         }
+    }
 
-        done(null, chunk);
+    emitMbTransferredEvent() {
+        this.emit('megabyte-transferred');
     }
 };
