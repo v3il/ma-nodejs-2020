@@ -5,7 +5,7 @@ const config = require('../config');
 const SpeedLimiter = require('./SpeedLimiter');
 
 function sendJPEG(response) {
-    const { filePath, limit, minLimit, statusSymbol, dataVolumeToNotify } = config;
+    const { filePath, limit, minLimit, statusSymbol } = config;
 
     const readStream = fs.createReadStream(filePath);
 
@@ -14,10 +14,7 @@ function sendJPEG(response) {
         response.emit('error', new Error('Failed to read image!'));
     });
 
-    const speedLimiter = new SpeedLimiter({
-        dataVolumeToNotify,
-        limit: Math.max(limit, minLimit),
-    });
+    const speedLimiter = new SpeedLimiter(Math.max(limit, minLimit));
 
     speedLimiter.on('megabyte-transferred', () => {
         process.stdout.write(statusSymbol);

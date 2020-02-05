@@ -1,80 +1,54 @@
 const { Transform } = require('stream');
 const { performance } = require('perf_hooks');
+const { promisify } = require('util');
 
-const ITERATION_DURATION = 1000;
+const promisifiedSetTimeout = promisify(setTimeout);
 
 module.exports = class SpeedLimiter extends Transform {
-    constructor({ dataVolumeToNotify, limit }) {
+    constructor(limit) {
         super();
 
         this.limit = limit;
-        this.dataVolumeToNotify = dataVolumeToNotify;
 
         this.transferedDataSize = 0;
-        this.unsentData = null;
-        this.iterationStart = performance.now();
-        this.isNewIteration = false;
         this.transferedDataSizeAccumulator = 0;
+        this.iterationStart = performance.now();
 
         this.on('end', () => {
             // Something was transferred during the very last iteration
-            if (this.transferedDataSize > 0) {
+            if (this.transferedDataSizeAccumulator > 0) {
                 this.emitMbTransferredEvent();
             }
         });
     }
 
     // eslint-disable-next-line no-underscore-dangle
-    _transform(chunk, encoding, done) {
-        if (this.isNewIteration) {
-            if (this.unsentData) {
-                this.push(this.unsentData);
-                this.transferedDataSize += this.unsentData.length;
+    async _transform(chunk, encoding, done) {
+        const defaultChunkSize = 64 * 1024; // bytes
+        const dataVolumeToNotify = 1024 * 1024; // bytes
+        const iterationDuration = 1000; // milliseconds
 
-                this.transferedDataSizeAccumulator += this.unsentData.length;
-                this.checkAccumulatedDataVolume();
+        const remainingDataVolume = this.limit - this.transferedDataSize - chunk.length;
+        const isLastChunkForThisIteration = remainingDataVolume < defaultChunkSize;
 
-                this.unsentData = null;
-            }
+        const remainingTime = this.iterationStart + iterationDuration - performance.now();
 
-            this.isNewIteration = false;
-        }
+        if (isLastChunkForThisIteration && remainingTime > 0) {
+            await promisifiedSetTimeout(remainingTime);
 
-        // Can't send more data in this iteration (limit reached)
-        if (this.transferedDataSize + chunk.length > this.limit) {
-            // We'll send this data at the beginning of next iteration
-            this.unsentData = chunk;
-
-            const remainingTime = this.iterationStart + ITERATION_DURATION - performance.now();
-
-            // Pause stream execution for remaining time
-            if (remainingTime > 0) {
-                setTimeout(() => {
-                    this.isNewIteration = true;
-
-                    this.iterationStart = performance.now();
-                    this.transferedDataSize = 0;
-
-                    done();
-                }, remainingTime);
-            } else {
-                done();
-            }
+            this.iterationStart = performance.now();
+            this.transferedDataSize = 0;
         } else {
             this.transferedDataSize += chunk.length;
-
             this.transferedDataSizeAccumulator += chunk.length;
-            this.checkAccumulatedDataVolume();
-
-            done(null, chunk);
         }
-    }
 
-    checkAccumulatedDataVolume() {
-        if (this.transferedDataSizeAccumulator >= this.dataVolumeToNotify) {
+        if (this.transferedDataSizeAccumulator >= dataVolumeToNotify) {
             this.emitMbTransferredEvent();
             this.transferedDataSizeAccumulator = 0;
         }
+
+        done(null, chunk);
     }
 
     emitMbTransferredEvent() {
