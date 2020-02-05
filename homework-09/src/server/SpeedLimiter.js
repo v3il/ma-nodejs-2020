@@ -13,13 +13,6 @@ module.exports = class SpeedLimiter extends Transform {
         this.transferedDataSize = 0;
         this.transferedDataSizeAccumulator = 0;
         this.iterationStart = performance.now();
-
-        this.on('end', () => {
-            // Something was transferred during the very last iteration
-            if (this.transferedDataSizeAccumulator > 0) {
-                this.emitMbTransferredEvent();
-            }
-        });
     }
 
     // eslint-disable-next-line no-underscore-dangle
@@ -44,14 +37,10 @@ module.exports = class SpeedLimiter extends Transform {
         }
 
         if (this.transferedDataSizeAccumulator >= dataVolumeToNotify) {
-            this.emitMbTransferredEvent();
+            this.emit('megabyte-transferred');
             this.transferedDataSizeAccumulator = 0;
         }
 
         done(null, chunk);
-    }
-
-    emitMbTransferredEvent() {
-        this.emit('megabyte-transferred');
     }
 };
