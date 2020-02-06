@@ -10,8 +10,8 @@ module.exports = class SpeedLimiter extends Transform {
 
         this.limit = limit;
 
-        this.transferedDataSize = 0;
-        this.transferedDataSizeAccumulator = 0;
+        this.transferredDataSize = 0;
+        this.transferredDataSizeAccumulator = 0;
         this.iterationStart = performance.now();
     }
 
@@ -21,7 +21,7 @@ module.exports = class SpeedLimiter extends Transform {
         const dataVolumeToNotify = 1024 * 1024; // bytes
         const iterationDuration = 1000; // milliseconds
 
-        const remainingDataVolume = this.limit - this.transferedDataSize - chunk.length;
+        const remainingDataVolume = this.limit - this.transferredDataSize - chunk.length;
         const isLastChunkForThisIteration = remainingDataVolume < defaultChunkSize;
 
         const remainingTime = this.iterationStart + iterationDuration - performance.now();
@@ -30,15 +30,16 @@ module.exports = class SpeedLimiter extends Transform {
             await promisifiedSetTimeout(remainingTime);
 
             this.iterationStart = performance.now();
-            this.transferedDataSize = 0;
+            this.transferredDataSize = 0;
         } else {
-            this.transferedDataSize += chunk.length;
-            this.transferedDataSizeAccumulator += chunk.length;
+            this.transferredDataSize += chunk.length;
         }
 
-        if (this.transferedDataSizeAccumulator >= dataVolumeToNotify) {
+        this.transferredDataSizeAccumulator += chunk.length;
+
+        if (this.transferredDataSizeAccumulator >= dataVolumeToNotify) {
             this.emit('megabyte-transferred');
-            this.transferedDataSizeAccumulator = 0;
+            this.transferredDataSizeAccumulator = 0;
         }
 
         done(null, chunk);
