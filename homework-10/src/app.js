@@ -1,7 +1,23 @@
-require('dotenv').config();
-
 const knexInstance = require('./knexInstance');
-const { createUsers, fetchUsers, updateUsers, removeUsers } = require('./demo_actions');
+const usersService = require('./usersService');
+
+function createUsers() {
+    const users = [
+        { login: 'John', password: 'Secret' },
+        { login: 'Nick', password: 'Secret' },
+    ];
+
+    const promises = users.map(({ login, password }) => {
+        const token = Buffer.from(`${login}:${password}`).toString('base64');
+        return usersService.create({ login, password, token });
+    });
+
+    return Promise.all(promises);
+}
+
+function updateUsers(where, newData) {
+    return usersService.update(where, newData);
+}
 
 (async function() {
     try {
@@ -10,18 +26,18 @@ const { createUsers, fetchUsers, updateUsers, removeUsers } = require('./demo_ac
         console.log(`Successfully added ${insertedIds.length} user(s). IDs are: ${insertedIds}`);
 
         console.log('\n\x1b[31mFetch\x1b[37m');
-        console.log(await fetchUsers());
+        console.log(await usersService.fetch());
 
         console.log('\n\x1b[31mUpdate\x1b[37m');
-        const updatedUsersCount = await updateUsers(insertedIds[0]);
+        const updatedUsersCount = await updateUsers({ id: insertedIds[0] }, { login: 'Dan' });
         console.log(`Successfully updated ${updatedUsersCount} user(s).`);
 
         console.log('\n\x1b[31mDelete\x1b[37m');
-        const removedUsersCount = await removeUsers(insertedIds[1]);
+        const removedUsersCount = await usersService.delete({ id: insertedIds[1] });
         console.log(`Successfully removed ${removedUsersCount} user(s).`);
 
         console.log('\n\x1b[31mFetch\x1b[37m');
-        console.log(await fetchUsers());
+        console.log(await usersService.fetch());
     } catch (error) {
         console.log(error);
     } finally {

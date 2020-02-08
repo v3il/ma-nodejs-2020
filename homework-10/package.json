@@ -7,7 +7,8 @@
         "lint": "npx eslint --ignore-path .gitignore .",
         "lint:fix": "npx eslint --ignore-path .gitignore . --fix",
         "test:dev": "jest --no-cache --watch --passWithNoTests",
-        "test": "jest --no-cache --silent --passWithNoTests"
+        "test": "jest --no-cache --silent --passWithNoTests",
+        "migrate": "npx knex migrate:latest"
     },
     "author": "Dmitry Kit",
     "devDependencies": {

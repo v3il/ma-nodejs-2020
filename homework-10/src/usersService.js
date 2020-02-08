@@ -1,4 +1,4 @@
-const knexInstance = require('../knexInstance');
+const knexInstance = require('./knexInstance');
 
 const TABLE_NAME = 'users';
 
