@@ -3,23 +3,23 @@ const knexInstance = require('./knexInstance');
 const TABLE_NAME = 'users';
 
 module.exports = {
-    async fetch(where = {}) {
+    fetch(where = {}) {
         return knexInstance(TABLE_NAME)
             .where(where)
             .select();
     },
 
-    async create(newUser) {
+    create(newUser) {
         return knexInstance(TABLE_NAME).insert(newUser);
     },
 
-    async update(where = {}, newUser = {}) {
+    update(where = {}, newUser = {}) {
         return knexInstance(TABLE_NAME)
             .where(where)
             .update(newUser);
     },
 
-    async delete(where) {
+    delete(where) {
         return knexInstance(TABLE_NAME)
             .where(where)
             .del();
