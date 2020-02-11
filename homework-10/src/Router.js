@@ -144,8 +144,7 @@ module.exports = class Router {
                     console.error(error);
 
                     response.sendJSON(500, {
-                        message: http.STATUS_CODES[500],
-                        details: error.message,
+                        message: error.message,
                     });
                 }
             }

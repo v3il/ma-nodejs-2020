@@ -4,8 +4,7 @@ module.exports = router => {
         require('./main'),
         require('./404'),
         require('./getUsers'),
-        require('./createUser'),
-        require('./updateUser'),
+        require('./saveUser'),
         require('./deleteUser'),
     ].forEach(initRoute => initRoute(router));
 };

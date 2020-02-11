@@ -10,7 +10,7 @@ const setupRoutes = require('./routes');
 
 const router = new Router();
 
-router.setStaticDir('assets');
+router.setStaticDir('client/dist');
 router.setViewsDir('src/views');
 
 setupRoutes(router);

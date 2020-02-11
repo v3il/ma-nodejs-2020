@@ -6,10 +6,7 @@ module.exports = router => {
     router.get('/users', async (request, response) => {
         try {
             const users = await usersService.fetch();
-
-            response.sendJSON(200, {
-                users,
-            });
+            response.sendJSON(200, { users });
         } catch (error) {
             console.error(error);
 

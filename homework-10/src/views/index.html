@@ -4,107 +4,13 @@
     <meta charset="UTF-8">
     <title>Main page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../client/dist/style.css">
 </head>
 <body>
 
-<header>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <button type="button" class="btn btn-primary js-create-user-btn">Create user</button>
-    </nav>
-</header>
+<div id="app"></div>
 
-<div class="notification js-notification"></div>
-
-<div class="container-fluid" style="padding: 12px">
-    <div id="users-content" style="display: none;">
-        <table class="table table-dark" id="users-table" style="margin: 12px 0">
-            <thead>
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Login</th>
-                <th scope="col">Password</th>
-                <th scope="col">Token</th>
-                <th scope="col">Actions</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-</div>
-
-<div id="users-form" style="display: none;">
-    <div id="form">
-        <h2 class="js-create-user-title" style="display: none">Create user</h2>
-        <h2 class="js-update-user-title" style="display: none">Update user</h2>
-
-        <input type="hidden" class="form-control" id="id">
-
-        <div class="form-group">
-            <label for="login">Login</label>
-            <input type="text" class="form-control" id="login">
-        </div>
-
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="text" class="form-control" id="password">
-        </div>
-
-        <button type="submit" class="btn btn-primary js-send-form-create" style="display: none">Create</button>
-        <button type="submit" class="btn btn-primary js-send-form-update" style="display: none">Update</button>
-        <button type="submit" class="btn btn-default js-close-form">Close</button>
-    </div>
-</div>
-
-<style>
-    #users-form {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1050;
-        background-color: #121212eb;
-    }
-
-    #form {
-        width: 600px;
-        background-color: #fafafa;
-        border-radius: 6px;
-        padding: 24px;
-    }
-
-    .notification {
-        position: fixed;
-        right: 12px;
-        top: 12px;
-        width: 350px;
-        padding: 12px;
-        border-radius: 6px;
-        border: 1px solid transparent;
-        z-index: 1100;
-    }
-
-    .notification.success {
-        color: #155724;
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-    }
-
-    .notification.error {
-        color: #721c24;
-        background-color: #f8d7da;
-        border-color: #f5c6cb;
-    }
-</style>
-
-<script
-    src="https://code.jquery.com/jquery-3.4.1.min.js"
-    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-    crossorigin="anonymous"></script>
-<script src="../../assets/js/script.js"></script>
+<script src="../../client/dist/vendor.js"></script>
+<script src="../../client/dist/app.js"></script>
 </body>
 </html>
