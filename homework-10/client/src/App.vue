@@ -16,7 +16,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="user in users">
+                <tr v-for="user in users" :key="user.id">
                     <td>{{user.id}}</td>
                     <td>{{user.login}}</td>
                     <td>{{user.password}}</td>
@@ -116,6 +116,8 @@
                         if (response.data.affectedRows > 0) {
                             this.showNotification('Successfully deleted');
                             this.users = this.users.filter(item => item.id !== id);
+                        } else {
+                            this.showNotification('No users were removed', 'error');
                         }
                     } catch (error) {
                         this.showNotification(error.response.data.message, 'error');
