@@ -23,6 +23,7 @@
     "webpack-parallel-uglify-plugin": "^1.1.2"
   },
   "scripts": {
-    "dev": "node ./node_modules/webpack/bin/webpack.js --progress"
+    "dev": "node ./node_modules/webpack/bin/webpack.js --progress",
+    "build": "node ./node_modules/webpack/bin/webpack.js --progress"
   }
 }

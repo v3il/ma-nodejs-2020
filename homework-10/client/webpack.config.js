@@ -1,5 +1,6 @@
 const path = require('path');
 
+const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
@@ -16,7 +17,7 @@ const webpackConfig = {
     },
 
     cache: true,
-    watch: true,
+    // watch: true,
     target: 'web',
     mode: 'production',
     devtool: 'inline-cheap-module-source-map',
@@ -44,13 +45,13 @@ const webpackConfig = {
         },
 
         minimizer: [
-            // new ParallelUglifyPlugin({
-            //     workerCount: 4,
-            //     uglifyES: {
-            //         ecma: 8,
-            //         mangle: true,
-            //     },
-            // }),
+            new ParallelUglifyPlugin({
+                workerCount: 4,
+                uglifyES: {
+                    ecma: 8,
+                    mangle: true,
+                },
+            }),
         ],
     },
 
@@ -91,7 +92,7 @@ const webpackConfig = {
                         {
                             loader: 'css-loader',
                             options: {
-                                minimize: !true,
+                                minimize: true,
                                 sourceMap: true,
                             },
                         },
