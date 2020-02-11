@@ -1,5 +1,3 @@
-const http = require('http');
-
 const usersService = require('../usersService');
 
 module.exports = router => {
@@ -15,7 +13,7 @@ module.exports = router => {
             console.error(error);
 
             response.sendJSON(500, {
-                message: http.STATUS_CODES[500],
+                message: error.message,
             });
         }
     });
