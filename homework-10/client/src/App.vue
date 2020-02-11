@@ -28,6 +28,10 @@
                 </tr>
                 </tbody>
             </table>
+
+            <div class="alert alert-primary" role="alert" v-if="!users.length && usersFetched">
+                No created users.
+            </div>
         </main>
 
         <transition name="fade">
@@ -75,6 +79,8 @@
 				users: [],
 				selectedUser: null,
 
+                usersFetched: false,
+
 				notificationData: null,
 				notificationTimeout: null,
 			}
@@ -85,7 +91,9 @@
 
 			try {
                 const response = await axios.get(ENDPOINT);
+
                 this.users = response.data.users;
+                this.usersFetched = true;
 
                 this.showNotification('Successfully fetched!');
 			} catch (error) {
