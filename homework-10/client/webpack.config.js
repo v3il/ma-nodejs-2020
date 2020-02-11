@@ -1,6 +1,5 @@
 const path = require('path');
 
-const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
