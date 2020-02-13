@@ -11,9 +11,8 @@ Visit this [site](http://194.32.79.212:3000/)
 2. Configure server project: \
 ```cd ..``` \
 ```npm ci```
-3. Rename **.env.copy** to **.env** and fill it with your connection params
-4. Run migrations: \
-```npm run migrate```
-5. Start server: \
-```npm start```
-6. Open http://localhost:XXXX/
+3. Rename **.env.example** to **.env** and fill it with your connection params
+4. Start server: \
+```npm start``` \
+This command will automatically execute all migrations and will start the server
+5. Open http://localhost:XXXX/
