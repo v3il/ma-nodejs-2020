@@ -2,13 +2,13 @@
     "name": "homework-11",
     "main": "src/app.js",
     "scripts": {
-        "dev": "nodemon src/app.js",
+        "dev": "npm run prestart && nodemon src/app.js",
         "start": "node src/app.js",
         "lint": "npx eslint --ignore-path client/.eslintignore .",
         "lint:fix": "npx eslint --ignore-path client/.eslintignore . --fix",
         "test:dev": "jest --no-cache --watch --passWithNoTests",
         "test": "jest --no-cache --silent --passWithNoTests",
-        "prestart": "npx knex migrate:latest"
+        "prestart": "npx sequelize-cli db:migrate"
     },
     "author": "Dmitry Kit",
     "devDependencies": {
@@ -31,6 +31,7 @@
     "dependencies": {
         "dotenv": "^8.2.0",
         "mysql": "^2.18.1",
+        "mysql2": "^2.1.0",
         "sequelize": "^5.21.4"
     }
 }

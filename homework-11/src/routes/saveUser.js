@@ -16,8 +16,8 @@ module.exports = router => {
                 await usersService.update({ id }, { login, password, token });
                 response.sendJSON(200, { id, login, password, token });
             } else {
-                const ids = await usersService.create({ login, password, token });
-                response.sendJSON(200, { id: ids[0], login, password, token });
+                const createdUser = await usersService.create({ login, password, token });
+                response.sendJSON(200, { id: createdUser.id, login, password, token });
             }
         } catch (error) {
             console.error(error);

@@ -1,27 +1,19 @@
-const knexInstance = () => {};
-
-const TABLE_NAME = 'users';
+const { User } = require('./models');
 
 module.exports = {
     fetch(where = {}) {
-        return knexInstance(TABLE_NAME)
-            .where(where)
-            .select();
+        return User.findAll(where);
     },
 
     create(newUser) {
-        return knexInstance(TABLE_NAME).insert(newUser);
+        return User.create(newUser);
     },
 
-    update(where = {}, newUser = {}) {
-        return knexInstance(TABLE_NAME)
-            .where(where)
-            .update(newUser);
+    async update(where = {}, newUser = {}) {
+        return User.update(newUser, { where });
     },
 
     delete(where) {
-        return knexInstance(TABLE_NAME)
-            .where(where)
-            .del();
+        return User.destroy({ where });
     },
 };
